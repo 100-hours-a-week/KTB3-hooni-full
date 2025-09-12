@@ -31,3 +31,11 @@
 
 
 6. 주문을 진행할 때 현재까지 선택된 메뉴들의 금액 총합을 보여준다.
+
+
+## 객체 설계도
+<img src="https://github.com/user-attachments/assets/e7b90375-ade8-4165-b223-bb28ed8268d4" height="500px" width="500px"/>
+
+## 클래스 설계도
+<img src="https://github.com/user-attachments/assets/f878a099-d48d-4dcc-9cf3-5b569b66002e" height="500px" width="500px"/>
+
