@@ -11,7 +11,7 @@ public class Reader {
         this.reader = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    public void read() throws IOException {
-        this.reader.readLine();
+    public String read() throws IOException {
+        return reader.readLine();
     }
 }
