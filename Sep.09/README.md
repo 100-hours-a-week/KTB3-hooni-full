@@ -34,8 +34,11 @@
 
 
 ## 객체 설계도
-<img src="https://github.com/user-attachments/assets/e7b90375-ade8-4165-b223-bb28ed8268d4" height="500px" width="500px"/>
+![Image](https://github.com/user-attachments/assets/e26458a0-079c-4e67-bb57-8d1f9d379fac)
 
 ## 클래스 설계도
-<img src="https://github.com/user-attachments/assets/f878a099-d48d-4dcc-9cf3-5b569b66002e" height="500px" width="500px"/>
+![Image](https://github.com/user-attachments/assets/3dfa3330-96bc-4e78-8483-a0371d5bc894)
+
+# 구현 이후 변경된 객체 의존 방향 이미지
+![Image](https://github.com/user-attachments/assets/acc8f010-4b69-441a-a275-7d174c3b98f3)
 
