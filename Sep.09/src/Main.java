@@ -1,4 +1,6 @@
+import menu.Menu;
 import menu.Menus;
+import ordering.ShoppingCart;
 import reader.ConsoleIO;
 
 public class Main {
@@ -11,13 +13,17 @@ public class Main {
         Menus menus = Menus.init();
 
         while (true) {
+            ShoppingCart shoppingCart = new ShoppingCart();
+
             ConsoleIO.print(WELCOME_MESSAGE);
             ConsoleIO.print(YOU_SHOULD_ENTER_CHOICE_NUMBER);
 
-            menus.chooseMainMenu();
+            Menu mainMenu = menus.chooseMainMenu();
+            shoppingCart.add(mainMenu);
 
             while (wantMoreMenu()) {
-                menus.chooseMoreMenu();
+                Menu extraMenu = menus.chooseMoreMenu();
+                shoppingCart.add(extraMenu);
             }
 
             // TODO: 추가 메뉴 선택 끝나면 결제 프로세스 진행
