@@ -25,4 +25,15 @@ public class ShoppingCart {
                 .mapToInt(menu -> menu.getPrice() * pickedMenus.get(menu))
                 .sum();
     }
+
+    String getBillFormat() {
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<Menu, Integer> entry : pickedMenus.entrySet()) {
+            sb.append(entry.getKey().getName()).append(" (*").append(entry.getValue()).append(")")
+                    .append("  || ").append(entry.getKey().getPrice() * entry.getValue()).append("\n");
+        }
+
+        return sb.toString();
+    }
 }

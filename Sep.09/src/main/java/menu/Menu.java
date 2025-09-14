@@ -9,7 +9,7 @@ public abstract class Menu {
 
     private final int id;
     private final String name;
-    private int price;
+    private final int price;
 
     Menu(String name, int price) {
         this.id = index++;
@@ -23,6 +23,10 @@ public abstract class Menu {
 
     public boolean is(int id) {
         return this.id == id;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public int getPrice() {
