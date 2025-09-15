@@ -11,7 +11,7 @@ public abstract class Menu {
     private final String name;
     private final int price;
 
-    Menu(String name, int price) {
+    protected Menu(String name, int price) {
         this.id = index++;
         this.name = name;
         this.price = price;
