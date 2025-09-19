@@ -59,9 +59,26 @@ public class Main {
 
     private static boolean wantMoreMenu(TouchScreen touchScreen) {
         touchScreen.show(GuidanceMessage.WOULD_YOU_CHOOSE_MORE_MENU.getText());
-        int input = touchScreen.inputNaturalNumber();
+
+        int input = 0;
+        while (true) {
+            input = touchScreen.inputNaturalNumber();
+
+            try {
+                validateIsAllowedChoice(input);
+                break;
+            } catch (IllegalArgumentException e) {
+                touchScreen.show(e);
+            }
+        }
 
         return YES == input;
+    }
+
+    private static void validateIsAllowedChoice(int input) {
+        if (input != 1 && input != 2) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private static void chooseMoreMenu(TouchScreen touchScreen, Menus menus, ShoppingCart shoppingCart) {
