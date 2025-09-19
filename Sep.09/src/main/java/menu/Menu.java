@@ -1,7 +1,5 @@
 package menu;
 
-import reader.ConsoleIO;
-
 import java.util.Objects;
 
 public abstract class Menu {
@@ -17,8 +15,8 @@ public abstract class Menu {
         this.price = price;
     }
 
-    public void showInfo() {
-        ConsoleIO.printf("[%d. %s, %d원]   ", id, name, price);
+    public String getInfo() {
+        return String.format("[%d. %s, %d원]   ", id, name, price);
     }
 
     public boolean is(int id) {

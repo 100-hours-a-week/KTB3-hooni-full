@@ -1,13 +1,8 @@
 package menu;
 
-import reader.ConsoleIO;
-
 import java.util.List;
 
 public class Menus {
-    private static final String CHOOSE_MAIN_MENU = "필수 선택 메뉴를 골라주세요.";
-    private static final String CHOOSE_MORE_MENU = "추가 선택 메뉴를 골라주세요.";
-
     private final List<Menu> menus;
 
     private Menus() {
@@ -24,67 +19,59 @@ public class Menus {
         return new Menus();
     }
 
-    public Menu chooseMainMenu() {
-        ConsoleIO.print(CHOOSE_MAIN_MENU);
-        showMainMenus();
+    public String getMainMenuInfos() {
+        StringBuilder sb = new StringBuilder();
 
-        int menuId;
-        while (true) {
-            try {
-                menuId = ConsoleIO.inputNumber();
-                validateIsMainMenu(menuId);
-                break;
-            } catch (IllegalArgumentException e) {
-                ConsoleIO.printWrongInput();
-            }
-        }
-
-        return findMenu(menuId);
-    }
-
-    public Menu chooseMoreMenu() {
-        ConsoleIO.print(CHOOSE_MORE_MENU);
-        showAllMenus();
-
-        int menuId;
-        while (true) {
-            try {
-                menuId = ConsoleIO.inputNumber();
-                validateIsMenuId(menuId);
-                break;
-            } catch (IllegalArgumentException e) {
-                ConsoleIO.printWrongInput();
-            }
-        }
-
-        return findMenu(menuId);
-    }
-
-    private void showAllMenus() {
-        showMainMenus();
-        showBeverages();
-        showSideMenus();
-    }
-
-    private void showMainMenus() {
         menus.stream()
                 .filter(menu -> menu instanceof MainMenu)
-                .forEach(Menu::showInfo);
-        System.out.println(); // 출력 포맷을 위한 개행
+                .forEach(menu -> sb.append(menu.getInfo()));
+        sb.append("\n"); // 출력 포맷을 위한 개행
+
+        return sb.toString();
     }
 
-    private void showBeverages() {
+    public Menu chooseMainMenu(int menuId) {
+        validateIsMainMenu(menuId);
+
+        return findMenu(menuId);
+    }
+
+    public Menu chooseMoreMenu(int menuId) {
+        validateIsMenuId(menuId);
+
+        return findMenu(menuId);
+    }
+
+    public String getAllMenuInfos() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(getMainMenuInfos())
+                .append(getBeverageInfos())
+                .append(getSideMenuInfos());
+
+        return sb.toString();
+    }
+
+    private String getBeverageInfos() {
+        StringBuilder sb = new StringBuilder();
+
         menus.stream()
                 .filter(menu -> menu instanceof Beverage)
-                .forEach(Menu::showInfo);
-        System.out.println(); // 출력 포맷을 위한 개행
+                .forEach(menu -> sb.append(menu.getInfo()));
+        sb.append("\n"); // 출력 포맷을 위한 개행
+
+        return sb.toString();
     }
 
-    private void showSideMenus() {
+    private String getSideMenuInfos() {
+        StringBuilder sb = new StringBuilder();
+
         menus.stream()
                 .filter(menu -> menu instanceof SideMenu)
-                .forEach(Menu::showInfo);
-        System.out.println(); // 출력 포맷을 위한 개행
+                .forEach(menu -> sb.append(menu.getInfo()));
+        sb.append("\n");
+
+        return sb.toString();
     }
 
     private void validateIsMenuId(int menuId) {

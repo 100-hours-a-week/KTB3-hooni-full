@@ -1,56 +1,108 @@
+import io.InputReader;
+import io.OutputWriter;
 import menu.Menu;
 import menu.Menus;
 import ordering.Order;
 import ordering.ShoppingCart;
-import reader.ConsoleIO;
+import ui.GuidanceMessage;
+import ui.TouchScreen;
 
 import static java.lang.System.exit;
 
 public class Main {
-    private static final String WELCOME_MESSAGE = "안녕하세요. 주문을 시작해주세요.";
-    private static final String YOU_SHOULD_ENTER_CHOICE_NUMBER = "원하시는 메뉴 혹은 옵션의 번호를 입력하여 주문해주세요.\n";
-    private static final String WOULD_YOU_CHOOSE_MORE_MENU = "\n메뉴를 더 고르시겠습니까?\n 1. 추가 메뉴 구매하기 2. 결제하기\n";
-    private static final String THANK_YOU_FOR_USING = "\n주문을 완료했습니다. 이용해주셔서 감사합니다.\n\n";
-
     private static final int YES = 1;
 
     public static void main(String[] args) {
+        TouchScreen touchScreen = new TouchScreen(new InputReader(), new OutputWriter());
+
         Menus menus = Menus.init();
 
         while (true) {
             ShoppingCart shoppingCart = new ShoppingCart();
             Order order = new Order(shoppingCart);
 
-            ConsoleIO.print(WELCOME_MESSAGE);
-            ConsoleIO.print(YOU_SHOULD_ENTER_CHOICE_NUMBER);
+            touchScreen.show(GuidanceMessage.WELCOME_MESSAGE.getText());
+            touchScreen.show(GuidanceMessage.YOU_SHOULD_ENTER_CHOICE_NUMBER.getText());
 
-            Menu mainMenu = menus.chooseMainMenu();
-            shoppingCart.add(mainMenu);
+            touchScreen.show(menus.getMainMenuInfos());
+            chooseMainMenu(touchScreen, menus, shoppingCart);
 
-            while (wantMoreMenu()) {
-                Menu extraMenu = menus.chooseMoreMenu();
-                shoppingCart.add(extraMenu);
+            while (wantMoreMenu(touchScreen)) {
+                touchScreen.show(menus.getAllMenuInfos());
+                chooseMoreMenu(touchScreen, menus, shoppingCart);
             }
 
-            order.checkout();
+            touchScreen.show(order.getBill());
+            checkout(touchScreen, order);
 
-            ConsoleIO.print(THANK_YOU_FOR_USING);
+            touchScreen.show(GuidanceMessage.THANK_YOU_FOR_USING.getText());
             sleep(2);
         }
     }
 
-    private static boolean wantMoreMenu() {
-        ConsoleIO.print(WOULD_YOU_CHOOSE_MORE_MENU);
-        int input = ConsoleIO.inputNumber();
+    private static void chooseMainMenu(TouchScreen touchScreen, Menus menus, ShoppingCart shoppingCart) {
+        touchScreen.show(GuidanceMessage.CHOOSE_MAIN_MENU.getText());
+
+        while (true) {
+            int menuId = touchScreen.inputNaturalNumber();
+
+            try {
+                Menu mainMenu = menus.chooseMainMenu(menuId);
+                shoppingCart.add(mainMenu);
+
+                break;
+            } catch (IllegalArgumentException e) {
+                touchScreen.show(e);
+            }
+        }
+    }
+
+    private static boolean wantMoreMenu(TouchScreen touchScreen) {
+        touchScreen.show(GuidanceMessage.WOULD_YOU_CHOOSE_MORE_MENU.getText());
+        int input = touchScreen.inputNaturalNumber();
 
         return YES == input;
+    }
+
+    private static void chooseMoreMenu(TouchScreen touchScreen, Menus menus, ShoppingCart shoppingCart) {
+        touchScreen.show(GuidanceMessage.CHOOSE_MORE_MENU.getText());
+
+        while (true) {
+            int menuId = touchScreen.inputNaturalNumber();
+
+            try {
+                Menu extraMenu = menus.chooseMoreMenu(menuId);
+                shoppingCart.add(extraMenu);
+
+                break;
+            } catch (IllegalArgumentException e) {
+                touchScreen.show(e);
+            }
+        }
+    }
+
+    private static void checkout(TouchScreen touchScreen, Order order) {
+        touchScreen.show(GuidanceMessage.ENTER_MONEY.getText());
+
+        while (true) {
+            int amount = touchScreen.inputNaturalNumber();
+
+            try {
+                int change = order.pay(amount);
+                touchScreen.show(GuidanceMessage.RETURN_CHANGE_AMOUNT.getText() + " : " + change);
+
+                break;
+            } catch (IllegalArgumentException e) {
+                touchScreen.show(e);
+            }
+        }
     }
 
     private static void sleep(int seconds) {
         try {
             Thread.sleep(seconds * 1000L);
         } catch (InterruptedException e) {
-            ConsoleIO.print("[ERROR] 프로그램 오류, 프로그램 종료합니다.");
+            System.out.print("[ERROR] 프로그램 오류, 프로그램 종료합니다.");
             exit(1);
         }
     }
