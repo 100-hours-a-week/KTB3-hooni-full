@@ -1,5 +1,7 @@
 package menu;
 
+import common.message.GuidanceMessage;
+
 import java.util.List;
 
 public class Menu {
@@ -86,7 +88,7 @@ public class Menu {
         try {
             menuItems.get(menuIndex);
         } catch (IndexOutOfBoundsException e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(GuidanceMessage.YOU_SHOULD_INPUT_RIGHT_RANGE_MENU_NUMBER.getText());
         }
     }
 
@@ -95,7 +97,7 @@ public class Menu {
 
         MenuItem menuItem = menuItems.get(menuIndex);
         if (!(menuItem.isMainDish())) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(GuidanceMessage.IT_IS_NOT_MAIN_DISH.getText());
         }
     }
 

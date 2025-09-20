@@ -1,5 +1,7 @@
 package ordering;
 
+import common.message.GuidanceMessage;
+
 public class Order {
     private static final String BILL_FORMAT = """
             
@@ -30,7 +32,7 @@ public class Order {
 
     private void validateEnoughToPay(int paidAmount) {
         if (paidAmount < shoppingCart.getTotalPrice()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(GuidanceMessage.YOU_SHOULD_INPUT_ENOUGH_TO_PAY.getText());
         }
     }
 

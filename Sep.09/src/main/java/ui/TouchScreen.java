@@ -1,5 +1,7 @@
 package ui;
 
+import common.message.GuidanceMessage;
+
 public class TouchScreen {
     Reader reader;
     Writer writer;

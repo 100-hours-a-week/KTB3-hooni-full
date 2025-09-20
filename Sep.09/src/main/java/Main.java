@@ -4,7 +4,7 @@ import menu.MenuItem;
 import menu.Menu;
 import ordering.Order;
 import ordering.ShoppingCart;
-import ui.GuidanceMessage;
+import common.message.GuidanceMessage;
 import ui.TouchScreen;
 
 import static java.lang.System.exit;
@@ -77,7 +77,7 @@ public class Main {
 
     private static void validateIsAllowedChoice(int input) {
         if (input != 1 && input != 2) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(GuidanceMessage.YOU_SHOULD_INPUT_RIGHT_RANGE_MENU_NUMBER.getText());
         }
     }
 

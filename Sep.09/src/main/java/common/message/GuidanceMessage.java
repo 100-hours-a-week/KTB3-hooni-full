@@ -1,4 +1,4 @@
-package ui;
+package common.message;
 
 public enum GuidanceMessage {
     WELCOME_MESSAGE("안녕하세요. 주문을 시작해주세요."),
@@ -14,6 +14,11 @@ public enum GuidanceMessage {
     // Error Message
     YOU_SHOULD_INPUT_INTEGER("숫자를 입력해주세요."),
     YOU_SHOULD_INPUT_NATURAL_NUMBER("1 이상의 자연수를 입력해주세요."),
+    YOU_SHOULD_INPUT_RIGHT_RANGE_MENU_NUMBER("올바른 메뉴의 숫자를 입력해주세요."),
+    IT_IS_NOT_MAIN_DISH("메인 메뉴를 선택해주세요."),
+    YOU_SHOULD_INPUT_ENOUGH_TO_PAY("결제 가능한 금액을 입력해주세요."),
+
+
 
     ;
 
