@@ -2,14 +2,14 @@ package ordering;
 
 import menu.MenuItem;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ShoppingCart {
     private final Map<MenuItem, Integer> pickedMenus;
 
     public ShoppingCart() {
-        this.pickedMenus = new HashMap<>();
+        this.pickedMenus = new LinkedHashMap<>();
     }
 
     public void add(MenuItem menu) {
