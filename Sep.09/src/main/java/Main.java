@@ -1,7 +1,7 @@
 import io.InputReader;
 import io.OutputWriter;
+import menu.MenuItem;
 import menu.Menu;
-import menu.Menus;
 import ordering.Order;
 import ordering.ShoppingCart;
 import ui.GuidanceMessage;
@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
         TouchScreen touchScreen = new TouchScreen(new InputReader(), new OutputWriter());
 
-        Menus menus = Menus.init();
+        Menu menu = Menu.init();
 
         while (true) {
             ShoppingCart shoppingCart = new ShoppingCart();
@@ -24,12 +24,12 @@ public class Main {
             touchScreen.show(GuidanceMessage.WELCOME_MESSAGE.getText());
             touchScreen.show(GuidanceMessage.YOU_SHOULD_ENTER_CHOICE_NUMBER.getText());
 
-            touchScreen.show(menus.getMainMenuInfos());
-            chooseMainMenu(touchScreen, menus, shoppingCart);
+            touchScreen.show(menu.getMainDishInfos());
+            chooseMainDish(touchScreen, menu, shoppingCart);
 
             while (wantMoreMenu(touchScreen)) {
-                touchScreen.show(menus.getAllMenuInfos());
-                chooseMoreMenu(touchScreen, menus, shoppingCart);
+                touchScreen.show(menu.getAllMenuInfos());
+                chooseMoreMenu(touchScreen, menu, shoppingCart);
             }
 
             touchScreen.show(order.getBill());
@@ -40,15 +40,15 @@ public class Main {
         }
     }
 
-    private static void chooseMainMenu(TouchScreen touchScreen, Menus menus, ShoppingCart shoppingCart) {
+    private static void chooseMainDish(TouchScreen touchScreen, Menu menu, ShoppingCart shoppingCart) {
         touchScreen.show(GuidanceMessage.CHOOSE_MAIN_MENU.getText());
 
         while (true) {
-            int menuId = touchScreen.inputNaturalNumber();
+            int menuItemId = touchScreen.inputNaturalNumber();
 
             try {
-                Menu mainMenu = menus.chooseMainMenu(menuId);
-                shoppingCart.add(mainMenu);
+                MenuItem mainDish = menu.chooseMainMenu(menuItemId);
+                shoppingCart.add(mainDish);
 
                 break;
             } catch (IllegalArgumentException e) {
@@ -81,14 +81,14 @@ public class Main {
         }
     }
 
-    private static void chooseMoreMenu(TouchScreen touchScreen, Menus menus, ShoppingCart shoppingCart) {
+    private static void chooseMoreMenu(TouchScreen touchScreen, Menu menu, ShoppingCart shoppingCart) {
         touchScreen.show(GuidanceMessage.CHOOSE_MORE_MENU.getText());
 
         while (true) {
             int menuId = touchScreen.inputNaturalNumber();
 
             try {
-                Menu extraMenu = menus.chooseMoreMenu(menuId);
+                MenuItem extraMenu = menu.chooseMoreMenu(menuId);
                 shoppingCart.add(extraMenu);
 
                 break;

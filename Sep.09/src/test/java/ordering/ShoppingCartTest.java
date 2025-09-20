@@ -1,6 +1,6 @@
 package ordering;
 
-import menu.Menu;
+import menu.MenuItem;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +13,7 @@ class ShoppingCartTest {
         ShoppingCart shoppingCart = new ShoppingCart();
 
         // when
-        Menu menu = new TestMenu(1, "테스트 메뉴", 1000);
+        MenuItem menu = new TestMenu(1, "테스트 메뉴", 1000);
         shoppingCart.add(menu);
 
         // then
@@ -24,14 +24,14 @@ class ShoppingCartTest {
     @Test
     public void 쇼핑카트에_이미_있는_메뉴_또_추가하기() {
         // given
-        Menu menu = new TestMenu(1, "테스트 메뉴", 1000);
-        Menu menu2 = new TestMenu(2, "테스트 메뉴2", 3000);
+        MenuItem menu = new TestMenu(1, "테스트 메뉴", 1000);
+        MenuItem menu2 = new TestMenu(2, "테스트 메뉴2", 3000);
         ShoppingCart shoppingCart = new ShoppingCart();
         shoppingCart.add(menu);
         shoppingCart.add(menu2);
 
         // when
-        Menu extraMenu = new TestMenu(1, "테스트 메뉴", 1000);
+        MenuItem extraMenu = new TestMenu(1, "테스트 메뉴", 1000);
         shoppingCart.add(extraMenu);
 
         // then
@@ -40,7 +40,7 @@ class ShoppingCartTest {
 
     }
 
-    static class TestMenu extends Menu {
+    static class TestMenu extends MenuItem {
         private final int id;
 
         TestMenu(int id, String name, int price) {

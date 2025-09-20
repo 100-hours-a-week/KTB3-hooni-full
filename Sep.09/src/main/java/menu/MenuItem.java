@@ -1,0 +1,51 @@
+package menu;
+
+import java.util.Objects;
+
+public abstract class MenuItem {
+    private static int index = 1;
+
+    private final int id;
+    private final String name;
+    private final int price;
+
+    protected MenuItem(String name, int price) {
+        this.id = index++;
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getInfo() {
+        return String.format("[%d. %s, %d원]   ", id, name, price);
+    }
+
+    public boolean is(int id) {
+        return this.id == id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public int getPrice() {
+        return this.price;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof MenuItem) {
+            return this.id == ((MenuItem) obj).id;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}

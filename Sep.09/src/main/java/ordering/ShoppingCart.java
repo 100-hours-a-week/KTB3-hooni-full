@@ -1,18 +1,18 @@
 package ordering;
 
-import menu.Menu;
+import menu.MenuItem;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ShoppingCart {
-    private final Map<Menu, Integer> pickedMenus;
+    private final Map<MenuItem, Integer> pickedMenus;
 
     public ShoppingCart() {
         this.pickedMenus = new HashMap<>();
     }
 
-    public void add(Menu menu) {
+    public void add(MenuItem menu) {
         pickedMenus.put(menu, pickedMenus.getOrDefault(menu, 0) + 1);
     }
 
@@ -29,7 +29,7 @@ public class ShoppingCart {
     String getBillFormat() {
         StringBuilder sb = new StringBuilder();
 
-        for (Map.Entry<Menu, Integer> entry : pickedMenus.entrySet()) {
+        for (Map.Entry<MenuItem, Integer> entry : pickedMenus.entrySet()) {
             sb.append(entry.getKey().getName()).append(" (*").append(entry.getValue()).append(")")
                     .append("  || ").append(entry.getKey().getPrice() * entry.getValue()).append("\n");
         }
