@@ -6,7 +6,8 @@ public class Menu {
     private final List<MenuItem> menuItems;
 
     private Menu() {
-        menuItems = List.of(new MainDish("빅맥", 5000), new MainDish("치즈버거", 2000),
+        menuItems = List.of(new DummyMenu("데이터", 1), // 리스트 1부터 시작을 위한 더미데이터
+                new MainDish("빅맥", 5000), new MainDish("치즈버거", 2000),
                 new MainDish("싸이버거", 4000), new MainDish("와퍼", 4500),
                 new Beverage("콜라", 1000), new Beverage("사이다", 1000),
                 new Beverage("제로콜라", 1500), new Beverage("제로사이다", 1500),
