@@ -24,22 +24,22 @@ public class Menu {
 
         menuItems.stream()
                 .filter(menuItem -> menuItem instanceof MainDish)
-                .forEach(menuItem -> sb.append(menuItem.getInfo()));
+                .forEach(menuItem -> sb.append(getInfo(menuItem)));
         sb.append("\n"); // 출력 포맷을 위한 개행
 
         return sb.toString();
     }
 
-    public MenuItem chooseMainMenu(int menuId) {
-        validateIsMainMenu(menuId);
+    public MenuItem chooseMainMenu(int menuIndex) {
+        validateIsMainMenu(menuIndex);
 
-        return findMenu(menuId);
+        return findMenu(menuIndex);
     }
 
-    public MenuItem chooseMoreMenu(int menuId) {
-        validateIsMenuId(menuId);
+    public MenuItem chooseMoreMenu(int menuIndex) {
+        validateIsMenuId(menuIndex);
 
-        return findMenu(menuId);
+        return findMenu(menuIndex);
     }
 
     public String getAllMenuInfos() {
@@ -57,7 +57,7 @@ public class Menu {
 
         menuItems.stream()
                 .filter(menuItem -> menuItem instanceof Beverage)
-                .forEach(menuItem -> sb.append(menuItem.getInfo()));
+                .forEach(menuItem -> sb.append(getInfo(menuItem)));
         sb.append("\n"); // 출력 포맷을 위한 개행
 
         return sb.toString();
@@ -68,33 +68,37 @@ public class Menu {
 
         menuItems.stream()
                 .filter(menuItem -> menuItem instanceof SideDish)
-                .forEach(menuItem -> sb.append(menuItem.getInfo()));
+                .forEach(menuItem -> sb.append(getInfo(menuItem)));
         sb.append("\n");
 
         return sb.toString();
     }
 
-    private void validateIsMenuId(int menuId) {
-        menuItems.stream()
-                .filter(menuItem -> menuItem.is(menuId))
-                .findAny()
-                .orElseThrow(IllegalArgumentException::new);
+    private String getInfo(MenuItem menuItem) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("[").append(menuItems.indexOf(menuItem)).append(". ").append(menuItem.getInfo()).append("]  ");
+        return sb.toString();
     }
 
-    private void validateIsMainMenu(int menuId) {
-        validateIsMenuId(menuId);
-
-        menuItems.stream()
-                .filter(menuItem -> menuItem.is(menuId))
-                .filter(menuItem -> menuItem instanceof MainDish)
-                .findAny()
-                .orElseThrow(IllegalArgumentException::new);
+    private void validateIsMenuId(int menuIndex) {
+        try {
+            menuItems.get(menuIndex);
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalArgumentException();
+        }
     }
 
-    private MenuItem findMenu(int menuId) {
-        return menuItems.stream()
-                .filter(menuItem -> menuItem.is(menuId))
-                .findAny()
-                .get(); // 이전 검증에서 이미 존재함을 확인했음
+    private void validateIsMainMenu(int menuIndex) {
+        validateIsMenuId(menuIndex);
+
+        MenuItem menuItem = menuItems.get(menuIndex);
+        if (!(menuItem instanceof MainDish)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private MenuItem findMenu(int menuIndex) {
+        return menuItems.get(menuIndex); // 이전 검증에서 이미 존재함을 확인했음
     }
 }

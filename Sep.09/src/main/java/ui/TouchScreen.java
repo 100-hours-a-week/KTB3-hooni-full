@@ -18,9 +18,9 @@ public class TouchScreen {
     }
 
     public int inputNaturalNumber() {
-        String input = reader.read();
-
         while (true) {
+            String input = reader.read();
+
             try {
                 int number = parseInteger(input);
                 validateNaturalNumber(number);

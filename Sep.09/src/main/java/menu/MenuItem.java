@@ -3,24 +3,16 @@ package menu;
 import java.util.Objects;
 
 public abstract class MenuItem {
-    private static int index = 1;
-
-    private final int id;
     private final String name;
     private final int price;
 
     protected MenuItem(String name, int price) {
-        this.id = index++;
         this.name = name;
         this.price = price;
     }
 
     public String getInfo() {
-        return String.format("[%d. %s, %d원]   ", id, name, price);
-    }
-
-    public boolean is(int id) {
-        return this.id == id;
+        return String.format("%s, %d원", name, price);
     }
 
     public String getName() {
@@ -38,7 +30,7 @@ public abstract class MenuItem {
         }
 
         if (obj instanceof MenuItem) {
-            return this.id == ((MenuItem) obj).id;
+            return this.name.equals(((MenuItem) obj).name);
         }
 
         return false;
@@ -46,6 +38,6 @@ public abstract class MenuItem {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(name);
     }
 }

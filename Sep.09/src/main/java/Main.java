@@ -44,10 +44,10 @@ public class Main {
         touchScreen.show(GuidanceMessage.CHOOSE_MAIN_MENU.getText());
 
         while (true) {
-            int menuItemId = touchScreen.inputNaturalNumber();
+            int menuItemIndex = touchScreen.inputNaturalNumber();
 
             try {
-                MenuItem mainDish = menu.chooseMainMenu(menuItemId);
+                MenuItem mainDish = menu.chooseMainMenu(menuItemIndex);
                 shoppingCart.add(mainDish);
 
                 break;
@@ -85,10 +85,10 @@ public class Main {
         touchScreen.show(GuidanceMessage.CHOOSE_MORE_MENU.getText());
 
         while (true) {
-            int menuId = touchScreen.inputNaturalNumber();
+            int menuIndex = touchScreen.inputNaturalNumber();
 
             try {
-                MenuItem extraMenu = menu.chooseMoreMenu(menuId);
+                MenuItem extraMenu = menu.chooseMoreMenu(menuIndex);
                 shoppingCart.add(extraMenu);
 
                 break;
