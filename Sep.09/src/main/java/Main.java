@@ -1,5 +1,5 @@
-import io.InputReader;
-import io.OutputWriter;
+import common.io.InputReader;
+import common.io.OutputWriter;
 import menu.MenuItem;
 import menu.Menu;
 import ordering.Order;
