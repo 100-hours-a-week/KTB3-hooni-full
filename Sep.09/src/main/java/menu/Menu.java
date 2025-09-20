@@ -6,13 +6,13 @@ public class Menu {
     private final List<MenuItem> menuItems;
 
     private Menu() {
-        menuItems = List.of(new DummyMenu("데이터", 1), // 리스트 1부터 시작을 위한 더미데이터
-                new MainDish("빅맥", 5000), new MainDish("치즈버거", 2000),
-                new MainDish("싸이버거", 4000), new MainDish("와퍼", 4500),
-                new Beverage("콜라", 1000), new Beverage("사이다", 1000),
-                new Beverage("제로콜라", 1500), new Beverage("제로사이다", 1500),
-                new SideDish("감자튀김", 1000), new SideDish("치킨너겟", 2000),
-                new SideDish("코울슬로", 2500), new SideDish("치즈스틱", 1500)
+        menuItems = List.of(new MenuItem("데이터", 1, MenuType.Dummy), // 리스트 1부터 시작을 위한 더미데이터
+                new MenuItem("빅맥", 5000, MenuType.MainDish), new MenuItem("치즈버거", 2000, MenuType.MainDish),
+                new MenuItem("싸이버거", 4000, MenuType.MainDish), new MenuItem("와퍼", 4500, MenuType.MainDish),
+                new MenuItem("콜라", 1000, MenuType.Beverage), new MenuItem("사이다", 1000, MenuType.Beverage),
+                new MenuItem("제로콜라", 1500, MenuType.Beverage), new MenuItem("제로사이다", 1500, MenuType.Beverage),
+                new MenuItem("감자튀김", 1000, MenuType.SideDish), new MenuItem("치킨너겟", 2000, MenuType.SideDish),
+                new MenuItem("코울슬로", 2500, MenuType.SideDish), new MenuItem("치즈스틱", 1500, MenuType.SideDish)
         );
     }
 
@@ -24,7 +24,7 @@ public class Menu {
         StringBuilder sb = new StringBuilder();
 
         menuItems.stream()
-                .filter(menuItem -> menuItem instanceof MainDish)
+                .filter(MenuItem::isMainDish)
                 .forEach(menuItem -> sb.append(getInfo(menuItem)));
         sb.append("\n"); // 출력 포맷을 위한 개행
 
@@ -57,7 +57,7 @@ public class Menu {
         StringBuilder sb = new StringBuilder();
 
         menuItems.stream()
-                .filter(menuItem -> menuItem instanceof Beverage)
+                .filter(MenuItem::isBeverage)
                 .forEach(menuItem -> sb.append(getInfo(menuItem)));
         sb.append("\n"); // 출력 포맷을 위한 개행
 
@@ -68,7 +68,7 @@ public class Menu {
         StringBuilder sb = new StringBuilder();
 
         menuItems.stream()
-                .filter(menuItem -> menuItem instanceof SideDish)
+                .filter(MenuItem::isSideDish)
                 .forEach(menuItem -> sb.append(getInfo(menuItem)));
         sb.append("\n");
 
@@ -94,7 +94,7 @@ public class Menu {
         validateIsMenuId(menuIndex);
 
         MenuItem menuItem = menuItems.get(menuIndex);
-        if (!(menuItem instanceof MainDish)) {
+        if (!(menuItem.isMainDish())) {
             throw new IllegalArgumentException();
         }
     }

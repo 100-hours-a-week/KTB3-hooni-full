@@ -2,13 +2,15 @@ package menu;
 
 import java.util.Objects;
 
-public abstract class MenuItem {
+public class MenuItem {
     private final String name;
     private final int price;
+    private final MenuType type;
 
-    protected MenuItem(String name, int price) {
+    protected MenuItem(String name, int price, MenuType type) {
         this.name = name;
         this.price = price;
+        this.type = type;
     }
 
     public String getInfo() {
@@ -21,6 +23,18 @@ public abstract class MenuItem {
 
     public int getPrice() {
         return this.price;
+    }
+
+    public boolean isMainDish() {
+        return this.type == MenuType.MainDish;
+    }
+
+    public boolean isBeverage() {
+        return this.type == MenuType.Beverage;
+    }
+
+    public boolean isSideDish() {
+        return this.type == MenuType.SideDish;
     }
 
     @Override
