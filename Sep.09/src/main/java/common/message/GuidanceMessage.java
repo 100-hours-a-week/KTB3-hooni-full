@@ -10,6 +10,7 @@ public enum GuidanceMessage {
     ENTER_MONEY("돈을 투입해주세요."),
     INSUFFICIENT_AMOUNT_TO_PAY("결제하기에 부족한 금액입니다."),
     RETURN_CHANGE_AMOUNT("거스름돈을 드리겠습니다."),
+    WE_SHOW_LIVE_SHOPPING_LIST("선택하신 메뉴는 화면에 실시간으로 표시됩니다."),
 
     // Error Message
     YOU_SHOULD_INPUT_INTEGER("숫자를 입력해주세요."),

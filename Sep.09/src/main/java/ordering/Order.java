@@ -24,6 +24,10 @@ public class Order {
         return String.format(BILL_FORMAT, shoppingCart.getBillFormat(), shoppingCart.getTotalPrice());
     }
 
+    public int getTotalPrice() {
+        return shoppingCart.getTotalPrice();
+    }
+
     public int pay(int paidAmount) {
         validateEnoughToPay(paidAmount);
 

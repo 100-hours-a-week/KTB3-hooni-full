@@ -5,6 +5,7 @@ import menu.Menu;
 import ordering.Order;
 import ordering.ShoppingCart;
 import common.message.GuidanceMessage;
+import ui.OrderProgressDisplay;
 import ui.TouchScreen;
 
 import static java.lang.System.exit;
@@ -21,6 +22,10 @@ public class Main {
             ShoppingCart shoppingCart = new ShoppingCart();
             Order order = new Order(shoppingCart);
 
+            OrderProgressDisplay orderDisplay = new OrderProgressDisplay(touchScreen, order);
+            Thread orderProgressThread = new Thread(orderDisplay);
+            orderProgressThread.start();
+
             touchScreen.show(GuidanceMessage.WELCOME_MESSAGE.getText());
             touchScreen.show(GuidanceMessage.YOU_SHOULD_ENTER_CHOICE_NUMBER.getText());
 
@@ -32,9 +37,9 @@ public class Main {
                 chooseMoreMenu(touchScreen, menu, shoppingCart);
             }
 
-            touchScreen.show(order.getBill());
             checkout(touchScreen, order);
 
+            orderDisplay.stop();
             touchScreen.show(GuidanceMessage.THANK_YOU_FOR_USING.getText());
             sleep(2);
         }
