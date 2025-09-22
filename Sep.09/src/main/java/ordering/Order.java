@@ -1,6 +1,11 @@
 package ordering;
 
 import common.message.GuidanceMessage;
+import ui.TouchScreen;
+
+import java.util.List;
+
+import static common.message.GuidanceMessage.REMOVE_INSUFFICIENT_ITEMS_AND_PAY;
 
 public class Order {
     private static final String BILL_FORMAT = """
@@ -28,8 +33,24 @@ public class Order {
         return shoppingCart.getTotalPrice();
     }
 
-    public int pay(int paidAmount) {
+    public int pay(int paidAmount, TouchScreen touchScreen) {
         validateEnoughToPay(paidAmount);
+
+        if (shoppingCart.isRemainingInStock()) {
+            shoppingCart.purchase();
+        } else {
+            List<String> soldOutItemNames = shoppingCart.removeInsufficientItems();
+
+            if (shoppingCart.isEmpty()) {
+                touchScreen.show(
+                        String.format(REMOVE_INSUFFICIENT_ITEMS_AND_PAY.getText(), soldOutItemNames) + "\n" +
+                        GuidanceMessage.NO_ITEMS_TO_CHECKOUT.getText());
+                return paidAmount;
+            }
+
+            touchScreen.show(String.format(REMOVE_INSUFFICIENT_ITEMS_AND_PAY.getText(), soldOutItemNames));
+            shoppingCart.purchase();
+        }
 
         return returnChange(paidAmount);
     }

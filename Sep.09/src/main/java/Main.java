@@ -104,13 +104,12 @@ public class Main {
     }
 
     private static void checkout(TouchScreen touchScreen, Order order) {
-        touchScreen.show(GuidanceMessage.ENTER_MONEY.getText());
-
         while (true) {
+            touchScreen.show(GuidanceMessage.ENTER_MONEY.getText());
             int amount = touchScreen.inputNaturalNumber();
 
             try {
-                int change = order.pay(amount);
+                int change = order.pay(amount, touchScreen);
                 touchScreen.show(GuidanceMessage.RETURN_CHANGE_AMOUNT.getText() + " : " + change);
 
                 break;
