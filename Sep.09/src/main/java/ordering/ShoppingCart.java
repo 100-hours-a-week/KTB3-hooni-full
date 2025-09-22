@@ -64,7 +64,7 @@ public class ShoppingCart {
 
             if (item.isSoldOut()) {
                 removedItems.add(item.getName());
-                pickedMenus.remove(item);
+                pickedMenus.put(item, 0);
             } else {
                 removedItems.add(item.getName());
                 pickedMenus.put(item, item.getStock());
