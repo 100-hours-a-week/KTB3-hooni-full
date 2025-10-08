@@ -23,7 +23,7 @@ public class OrderProgressDisplay implements Runnable {
         while (running) {
             String currentBill = order.getBill();
 
-            if (order.getTotalPrice() >= 0 && !currentBill.equals(previousBill)) {
+            if (order.getTotalPrice() > 0 && !currentBill.equals(previousBill)) {
                 touchScreen.show(currentBill);
                 previousBill = currentBill;
             }
