@@ -3,6 +3,7 @@ import common.io.OutputWriter;
 import menu.MenuItem;
 import menu.Menu;
 import ordering.Order;
+import ordering.OrderPayResult;
 import ordering.ShoppingCart;
 import common.message.GuidanceMessage;
 import ui.OrderProgressDisplay;
@@ -109,10 +110,19 @@ public class Main {
             int amount = touchScreen.inputNaturalNumber();
 
             try {
-                int change = order.pay(amount, touchScreen);
-                touchScreen.show(GuidanceMessage.RETURN_CHANGE_AMOUNT.getText() + " : " + change);
+                OrderPayResult result = order.pay(amount);
 
-                break;
+                if (result.isInsufficientStock()) {
+                    touchScreen.show(String.format(GuidanceMessage.REMOVE_INSUFFICIENT_ITEMS_AND_PAY.getText(), result.getInsufficientItems()));
+                } else if (result.isEmptyCart()) {
+                    touchScreen.show(
+                            String.format(GuidanceMessage.REMOVE_INSUFFICIENT_ITEMS_AND_PAY.getText(), result.getInsufficientItems()) + "\n" +
+                                    GuidanceMessage.NO_ITEMS_TO_CHECKOUT.getText());
+                }
+
+                touchScreen.show(GuidanceMessage.RETURN_CHANGE_AMOUNT.getText() + " : " + result.getChange());
+                return;
+
             } catch (IllegalArgumentException e) {
                 touchScreen.show(e);
             }

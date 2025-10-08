@@ -76,6 +76,11 @@ public class ShoppingCart {
     }
 
     public boolean isEmpty() {
-        return pickedMenus.isEmpty();
+        if (pickedMenus.isEmpty()) {
+            return true;
+        }
+
+        return pickedMenus.values().stream()
+                .allMatch(quantity -> quantity == 0);
     }
 }

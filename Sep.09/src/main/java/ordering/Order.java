@@ -1,11 +1,7 @@
 package ordering;
 
 import common.message.GuidanceMessage;
-import ui.TouchScreen;
-
 import java.util.List;
-
-import static common.message.GuidanceMessage.REMOVE_INSUFFICIENT_ITEMS_AND_PAY;
 
 public class Order {
     private static final String BILL_FORMAT = """
@@ -33,26 +29,22 @@ public class Order {
         return shoppingCart.getTotalPrice();
     }
 
-    public int pay(int paidAmount, TouchScreen touchScreen) {
+    public OrderPayResult pay(int paidAmount) {
         validateEnoughToPay(paidAmount);
 
         if (shoppingCart.isRemainingInStock()) {
             shoppingCart.purchase();
+            return OrderPayResult.success(returnChange(paidAmount));
         } else {
-            List<String> soldOutItemNames = shoppingCart.removeInsufficientItems();
+            List<String> removedItemNames = shoppingCart.removeInsufficientItems();
 
             if (shoppingCart.isEmpty()) {
-                touchScreen.show(
-                        String.format(REMOVE_INSUFFICIENT_ITEMS_AND_PAY.getText(), soldOutItemNames) + "\n" +
-                        GuidanceMessage.NO_ITEMS_TO_CHECKOUT.getText());
-                return paidAmount;
+                return new OrderPayResult(OrderStatus.EMPTY_CART, paidAmount, removedItemNames);
             }
 
-            touchScreen.show(String.format(REMOVE_INSUFFICIENT_ITEMS_AND_PAY.getText(), soldOutItemNames));
             shoppingCart.purchase();
+            return new OrderPayResult(OrderStatus.INSUFFICIENT_STOCK, returnChange(paidAmount), removedItemNames);
         }
-
-        return returnChange(paidAmount);
     }
 
     private void validateEnoughToPay(int paidAmount) {
