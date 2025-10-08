@@ -4,7 +4,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Stock {
-    private volatile int quantity;
+    private int quantity;
 
     private final Lock lock = new ReentrantLock();
 
