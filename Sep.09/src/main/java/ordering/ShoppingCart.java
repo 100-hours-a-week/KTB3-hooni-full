@@ -3,6 +3,7 @@ package ordering;
 import menu.MenuItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,7 @@ public class ShoppingCart {
     private final Map<MenuItem, Integer> pickedMenus;
 
     public ShoppingCart() {
-        this.pickedMenus = new LinkedHashMap<>();
+        this.pickedMenus = Collections.synchronizedMap(new LinkedHashMap<>());
     }
 
     public void add(MenuItem menu) {
