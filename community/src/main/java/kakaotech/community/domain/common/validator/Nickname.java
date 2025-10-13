@@ -14,11 +14,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {})
-@Size(min = 8, max = 20)
 @NotNull
-@Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^A-Za-z0-9])\\S+$")
-public @interface Password {
-    String message() default "비밀번호는 8자 이상 20자 이하의 대문자, 소문자, 숫자, 특수문자가 각각 최소 1개 포함되어야 합니다.";
+@Size(max = 10)
+@Pattern(regexp = "^[^\\s]+$")
+public @interface Nickname {
+    String message() default "띄어쓰기를 포함하지 않는 10글자 이내의 닉네임만 가능합니다.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

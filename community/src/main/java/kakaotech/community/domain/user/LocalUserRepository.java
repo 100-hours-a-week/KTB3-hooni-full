@@ -12,10 +12,16 @@ public class LocalUserRepository implements UserRepository {
     private final Map<Long, User> userDatabase = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(1);
 
-
     @Override
-    public User save(User user) {
-        return null;
+    public synchronized Long save(User user) {
+        if (user.getId() != null) {
+            userDatabase.put(user.getId(), user);
+            return user.getId();
+        }
+
+        user.assignId(idGenerator.getAndIncrement());
+        userDatabase.put(user.getId(), user);
+        return user.getId();
     }
 
     @Override
@@ -23,5 +29,17 @@ public class LocalUserRepository implements UserRepository {
         return userDatabase.values().stream()
                 .filter(user -> user.isSameEmail(email))
                 .findFirst();
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userDatabase.values().stream()
+                .anyMatch(user -> user.isSameEmail(email));
+    }
+
+    @Override
+    public boolean existsByNickname(String nickname) {
+        return userDatabase.values().stream()
+                .anyMatch(user -> user.isSameNickname(nickname));
     }
 }
