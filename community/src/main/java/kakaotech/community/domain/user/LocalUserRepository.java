@@ -42,4 +42,9 @@ public class LocalUserRepository implements UserRepository {
         return userDatabase.values().stream()
                 .anyMatch(user -> user.isSameNickname(nickname));
     }
+
+    public void clear() {
+        userDatabase.clear();
+        idGenerator.set(1);
+    }
 }
