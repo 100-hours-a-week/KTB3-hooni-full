@@ -13,6 +13,7 @@ public class AuthService {
 
     private final TokenGenerator tokenGenerator;
 
+    // FIXME. 이메일 틀린 시 UserException 발생 -> AuthException으로 변경 필요
     public Token login(String email, String password) {
         User user = userService.findByEmail(email);
         user.validateLoginable(password);
