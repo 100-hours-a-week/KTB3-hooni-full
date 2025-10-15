@@ -42,6 +42,9 @@ public class PostService {
 
         User writer = userService.findById(post.getWriterId());
 
+        post.viewedOne();
+        postRepository.save(post);
+
         return toDetail(writer, post);
     }
 
