@@ -51,7 +51,4 @@ public class PostLikeService {
         }
     }
 
-    public boolean isLiked(Long postId, Long userId) {
-        return postLikeRepository.existsByPostIdAndUserId(postId, userId);
-    }
 }

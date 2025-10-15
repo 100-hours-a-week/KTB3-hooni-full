@@ -32,6 +32,9 @@ class PostLikeServiceTest {
     private PostLikeService postLikeService;
 
     @Autowired
+    private PostLikeQueryService postLikeQueryService;
+
+    @Autowired
     private PostLikeRepository postLikeRepository;
 
     @Autowired
@@ -68,7 +71,7 @@ class PostLikeServiceTest {
 
         // then
         assertThat(postService.getPost(detail.postId()).likeCount()).isEqualTo(1L);
-        assertThat(postLikeService.isLiked(detail.postId(), 2L)).isTrue();
+        assertThat(postLikeQueryService.isLiked(detail.postId(), 2L)).isTrue();
     }
 
     @Test
@@ -87,8 +90,8 @@ class PostLikeServiceTest {
 
         // then
         assertThat(postService.getPost(detail.postId()).likeCount()).isEqualTo(2L);
-        assertThat(postLikeService.isLiked(detail.postId(), 2L)).isFalse();
-        assertThat(postLikeService.isLiked(detail.postId(), 3L)).isTrue();
-        assertThat(postLikeService.isLiked(detail.postId(), 4L)).isTrue();
+        assertThat(postLikeQueryService.isLiked(detail.postId(), 2L)).isFalse();
+        assertThat(postLikeQueryService.isLiked(detail.postId(), 3L)).isTrue();
+        assertThat(postLikeQueryService.isLiked(detail.postId(), 4L)).isTrue();
     }
 }
