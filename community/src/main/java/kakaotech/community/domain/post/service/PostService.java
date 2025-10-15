@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_FOUND;
+import static kakaotech.community.global.exception.code.ExceptionCode.POST_WRITER_MISMATCH;
 
 @Service
 @RequiredArgsConstructor
@@ -84,5 +85,21 @@ public class PostService {
                 post.getViewCount(),
                 post.getCreatedAt()
         );
+    }
+
+    public PostResponse.Detail update(Long userId, Long postId, String title, String content, MultipartFile image) {
+        Post prePost = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+
+        if (!prePost.isWrittenBy(userId)) {
+            throw new PostException(POST_WRITER_MISMATCH);
+        }
+
+        UUID newImageId = imageService.updateImage(prePost.getImageId(), image);
+
+        Post newPost = postRepository.save(prePost.update(title, content, newImageId));
+        User user = userService.findById(userId);
+
+        return toDetail(user, newPost);
     }
 }

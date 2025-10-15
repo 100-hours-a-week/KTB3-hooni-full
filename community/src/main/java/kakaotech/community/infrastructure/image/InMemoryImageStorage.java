@@ -23,10 +23,11 @@ public class InMemoryImageStorage implements ImageStorage {
     private final Map<UUID, InMemoryImage> imageDatabase = new ConcurrentHashMap<>();
 
     @Override
-    public UUID upload(UUID id, MultipartFile file) {
+    public synchronized UUID upload(UUID id, MultipartFile file) {
         InMemoryImage image = new InMemoryImage(
                 toByteArray(file),
-                Optional.ofNullable(file.getContentType()).orElse("application/octet-stream")
+                Optional.ofNullable(file.getContentType()).orElse("application/octet-stream"),
+                file.getSize()
         );
 
         imageDatabase.put(id, image);
@@ -38,7 +39,12 @@ public class InMemoryImageStorage implements ImageStorage {
         InMemoryImage image = Optional.ofNullable(imageDatabase.get(uuid))
                 .orElseThrow(() -> new ImageException(IMAGE_NOT_FOUND));
 
-        return new ImageMeta(new ByteArrayResource(image.bytes()), MediaType.parseMediaType(image.contentType()));
+        return new ImageMeta(new ByteArrayResource(image.bytes()), MediaType.parseMediaType(image.contentType()), image.size());
+    }
+
+    @Override
+    public synchronized void delete(UUID uuid) {
+        imageDatabase.remove(uuid);
     }
 
     private byte[] toByteArray(MultipartFile file) {

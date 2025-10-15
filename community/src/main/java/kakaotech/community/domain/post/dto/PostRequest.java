@@ -12,4 +12,12 @@ public class PostRequest {
             MultipartFile image
     ) {
     }
+
+    // Create와 완전히 동일, 그러나 의미적인 인지를 위해 그대로 둠.
+    public record Update(
+            @NotNull @Size(max = 26) String title,
+            @NotNull String content,
+            MultipartFile image
+    ) {
+    }
 }

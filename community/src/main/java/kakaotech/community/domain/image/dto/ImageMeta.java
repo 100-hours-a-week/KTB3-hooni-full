@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 
 public record ImageMeta(
         Resource resource,
-        MediaType mediaType
+        MediaType mediaType,
+        long size
 ) {
 }
