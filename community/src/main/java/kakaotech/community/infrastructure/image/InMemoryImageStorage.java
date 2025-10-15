@@ -1,9 +1,11 @@
 package kakaotech.community.infrastructure.image;
 
-import kakaotech.community.domain.common.image.ImageStorage;
+import kakaotech.community.domain.image.ImageStorage;
+import kakaotech.community.domain.image.dto.ImageMeta;
 import kakaotech.community.global.exception.ImageException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,11 +34,11 @@ public class InMemoryImageStorage implements ImageStorage {
     }
 
     @Override
-    public Resource getImage(UUID uuid) {
+    public ImageMeta getImage(UUID uuid) {
         InMemoryImage image = Optional.ofNullable(imageDatabase.get(uuid))
                 .orElseThrow(() -> new ImageException(IMAGE_NOT_FOUND));
 
-        return new ByteArrayResource(image.bytes());
+        return new ImageMeta(new ByteArrayResource(image.bytes()), MediaType.parseMediaType(image.contentType()));
     }
 
     private byte[] toByteArray(MultipartFile file) {

@@ -1,5 +1,6 @@
-package kakaotech.community.domain.common.image;
+package kakaotech.community.domain.image;
 
+import kakaotech.community.domain.image.dto.ImageMeta;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,5 +10,5 @@ public interface ImageStorage {
 
     UUID upload(UUID id, MultipartFile file);
 
-    Resource getImage(UUID uuid);
+    ImageMeta getImage(UUID imageId);
 }

@@ -1,6 +1,6 @@
 package kakaotech.community.domain.user.service;
 
-import kakaotech.community.domain.common.image.ImageService;
+import kakaotech.community.domain.image.service.ImageService;
 import kakaotech.community.domain.user.LocalUserRepository;
 import kakaotech.community.domain.user.UserRepository;
 import kakaotech.community.global.exception.AuthException;

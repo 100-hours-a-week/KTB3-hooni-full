@@ -1,8 +1,9 @@
-package kakaotech.community.domain.common.image;
+package kakaotech.community.domain.image.service;
 
+import kakaotech.community.domain.image.ImageStorage;
+import kakaotech.community.domain.image.dto.ImageMeta;
 import kakaotech.community.global.exception.ImageException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +32,7 @@ public class ImageService {
         return imageStorage.upload(uuid, file);
     }
 
-    public Resource load(UUID uuid) {
+    public ImageMeta load(UUID uuid) {
         return imageStorage.getImage(uuid);
     }
 }
