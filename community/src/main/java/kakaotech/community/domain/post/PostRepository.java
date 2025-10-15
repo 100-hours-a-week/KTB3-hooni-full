@@ -13,5 +13,7 @@ public interface PostRepository {
 
     void deleteById(Long postId);
 
+    boolean existsById(Long postId);
+
     int size();
 }

@@ -45,6 +45,10 @@ public class LocalPostRepository implements PostRepository {
         postDatabase.remove(id);
     }
 
+    public boolean existsById(Long id) {
+        return postDatabase.containsKey(id);
+    }
+
     public int size() {
         return postDatabase.size();
     }
