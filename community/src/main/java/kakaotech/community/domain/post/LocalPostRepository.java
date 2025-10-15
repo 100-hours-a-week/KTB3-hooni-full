@@ -2,6 +2,8 @@ package kakaotech.community.domain.post;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -23,7 +25,26 @@ public class LocalPostRepository implements PostRepository {
         return post;
     }
 
+    public List<Post> findPostsByPaging(int page) {
+        List<Post> snapshot = new ArrayList<>(postDatabase.values());
+        sort(snapshot);
+
+        int totalSize = snapshot.size();
+        int fromIndex = Math.min(page * 20, totalSize);
+        int toIndex = Math.min(fromIndex + 20, totalSize);
+
+        return (fromIndex < toIndex) ? snapshot.subList(fromIndex, toIndex) : List.of();
+    }
+
+    public int size() {
+        return postDatabase.size();
+    }
+
     public void clear() {
         postDatabase.clear();
+    }
+
+    private void sort(List<Post> list) {
+        list.sort((post1, post2) -> post2.getCreatedAt().compareTo(post1.getCreatedAt()));
     }
 }
