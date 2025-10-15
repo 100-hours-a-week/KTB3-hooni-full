@@ -4,6 +4,7 @@ import kakaotech.community.domain.image.service.ImageService;
 import kakaotech.community.domain.post.Post;
 import kakaotech.community.domain.post.PostRepository;
 import kakaotech.community.domain.post.dto.PostResponse;
+import kakaotech.community.domain.postlike.service.PostLikeQueryService;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.domain.user.service.UserService;
 import kakaotech.community.global.exception.PostException;
@@ -22,6 +23,7 @@ import static kakaotech.community.global.exception.code.ExceptionCode.POST_WRITE
 public class PostService {
     private final UserService userService;
     private final ImageService imageService;
+    private final PostLikeQueryService postLikeQueryService;
 
     private final PostRepository postRepository;
 
@@ -83,7 +85,8 @@ public class PostService {
                 post.getLikeCount(),
                 post.getCommentCount(),
                 post.getViewCount(),
-                post.getCreatedAt()
+                post.getCreatedAt(),
+                postLikeQueryService.isLiked(post.getId(), user.getId())
         );
     }
 

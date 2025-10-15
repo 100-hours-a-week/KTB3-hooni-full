@@ -17,7 +17,8 @@ public class PostResponse {
             Long likeCount,
             Long commentCount,
             Long viewCount,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            boolean isLikedByMe
     ) {
     }
 
