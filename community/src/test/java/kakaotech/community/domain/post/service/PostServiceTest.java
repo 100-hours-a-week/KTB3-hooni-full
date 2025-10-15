@@ -122,6 +122,26 @@ class PostServiceTest {
         assertThat(result.paging().totalSizes()).isEqualTo(40);
     }
 
+    @Test
+    void 게시글_상세_조회() {
+        // given
+        MultipartFile image = Mockito.mock(MultipartFile.class);
+        UUID imageId = UUID.randomUUID();
+
+        userService.join("email@email.com", "@ASasd1234", "hello", image);
+
+        when(imageService.save(image)).thenReturn(imageId);
+
+        // when
+        PostResponse.Detail savedPost = postService.create(1L, "testTitle", "testContent", image);
+        Long postId = savedPost.postId();
+
+        // then
+        PostResponse.Detail result = postService.getPost(postId);
+        assertThat(result.writerId()).isEqualTo(1L);
+        assertThat(result.title()).isEqualTo("testTitle");
+    }
+
     private void createPost(MultipartFile image, int size) {
         for (int i = 0; i < size; i++) {
             postService.create(1L, "title" + i, "content" + i, image);
