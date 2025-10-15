@@ -41,6 +41,10 @@ public class LocalPostRepository implements PostRepository {
         return (fromIndex < toIndex) ? snapshot.subList(fromIndex, toIndex) : List.of();
     }
 
+    public void deleteById(Long id) {
+        postDatabase.remove(id);
+    }
+
     public int size() {
         return postDatabase.size();
     }

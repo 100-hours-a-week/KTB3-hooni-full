@@ -8,6 +8,7 @@ import kakaotech.community.global.auth.annotation.Authenticated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,5 +47,11 @@ public class PostController {
         return ResponseEntity.ok(
                 postService.update(userId, postId, request.title(), request.content(), request.image())
         );
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(@Authenticated Long userId, @PathVariable Long postId) {
+        postService.delete(userId, postId);
+        return ResponseEntity.noContent().build();
     }
 }

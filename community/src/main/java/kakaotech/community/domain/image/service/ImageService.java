@@ -58,6 +58,10 @@ public class ImageService {
         return uuid;
     }
 
+    public void delete(UUID uuid) {
+        imageStorage.delete(uuid);
+    }
+
     private UUID generateUUID() {
         return UUID.randomUUID();
     }

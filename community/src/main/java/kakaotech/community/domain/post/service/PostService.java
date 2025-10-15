@@ -102,4 +102,16 @@ public class PostService {
 
         return toDetail(user, newPost);
     }
+
+    public void delete(Long userId, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+
+        if (post.isWrittenBy(userId)) {
+            throw new PostException(POST_WRITER_MISMATCH);
+        }
+
+        imageService.delete(post.getImageId());
+        postRepository.deleteById(postId);
+    }
 }
