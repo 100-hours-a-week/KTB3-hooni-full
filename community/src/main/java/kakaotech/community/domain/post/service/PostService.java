@@ -6,12 +6,15 @@ import kakaotech.community.domain.post.PostRepository;
 import kakaotech.community.domain.post.dto.PostResponse;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.domain.user.service.UserService;
+import kakaotech.community.global.exception.PostException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
+
+import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,15 @@ public class PostService {
         Post post = postRepository.save(new Post(userId, title, content, imageId));
 
         return toDetail(user, post);
+    }
+
+    public PostResponse.Detail getPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+
+        User writer = userService.findById(post.getWriterId());
+
+        return toDetail(writer, post);
     }
 
     public PostResponse.Summaries getPostsByPaging(int page) {
@@ -68,6 +80,7 @@ public class PostService {
                 user.getProfileImageId(),
                 post.getImageId(),
                 post.getLikeCount(),
+                post.getCommentCount(),
                 post.getViewCount(),
                 post.getCreatedAt()
         );

@@ -15,6 +15,7 @@ public class PostResponse {
             UUID writerProfileImage,
             UUID image,
             Long likeCount,
+            Long commentCount,
             Long viewCount,
             LocalDateTime createdAt
     ) {

@@ -23,6 +23,9 @@ public enum ExceptionCode {
     AUTH_TOKEN_NOT_FOUND("인증 토큰을 찾을 수 없습니다", UNAUTHORIZED),
     INVALID_AUTH_TOKEN("유효하지 않은 토큰입니다.", UNAUTHORIZED),
 
+    // Post
+    POST_NOT_FOUND("게시글을 찾을 수 없습니다", NOT_FOUND),
+
     // Image
     EMPTY_IMAGE("이미지가 비어있습니다.", BAD_REQUEST),
     IS_NOT_IMAGE_EXTENSION("이미지 타입이 아닙니다.", BAD_REQUEST),
