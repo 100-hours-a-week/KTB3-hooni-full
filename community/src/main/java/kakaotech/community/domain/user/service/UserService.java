@@ -1,6 +1,6 @@
 package kakaotech.community.domain.user.service;
 
-import kakaotech.community.domain.common.image.ImageService;
+import kakaotech.community.domain.image.service.ImageService;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.domain.user.UserRepository;
 import kakaotech.community.domain.user.dto.UserResponse;
@@ -23,6 +23,11 @@ public class UserService {
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 

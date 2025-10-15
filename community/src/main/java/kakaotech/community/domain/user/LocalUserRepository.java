@@ -32,6 +32,11 @@ public class LocalUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findById(Long id) {
+        return Optional.ofNullable(userDatabase.get(id));
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return userDatabase.values().stream()
                 .anyMatch(user -> user.isSameEmail(email));
