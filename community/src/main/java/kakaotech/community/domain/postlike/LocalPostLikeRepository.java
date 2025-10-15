@@ -21,4 +21,22 @@ public class LocalPostLikeRepository implements PostLikeRepository {
 
         return postLike;
     }
+
+    @Override
+    public synchronized void delete(Long postId, Long userId) {
+        if (!postLikeDatabase.containsKey(postId)) {
+            return;
+        }
+
+        postLikeDatabase.get(postId).remove(userId);
+    }
+
+    @Override
+    public boolean existsByPostIdAndUserId(Long postId, Long userId) {
+        return postLikeDatabase.containsKey(postId) && postLikeDatabase.get(postId).contains(userId);
+    }
+
+    public void clear() {
+        postLikeDatabase.clear();
+    }
 }

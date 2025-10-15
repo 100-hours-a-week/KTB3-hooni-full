@@ -35,4 +35,23 @@ public class PostLikeService {
             lock.unlock();
         }
     }
+
+    public void unlike(Long postId, Long userId) {
+        lock.lock();
+        try {
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+
+            post.unliked();
+            postRepository.save(post);
+
+            postLikeRepository.delete(postId, userId);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public boolean isLiked(Long postId, Long userId) {
+        return postLikeRepository.existsByPostIdAndUserId(postId, userId);
+    }
 }

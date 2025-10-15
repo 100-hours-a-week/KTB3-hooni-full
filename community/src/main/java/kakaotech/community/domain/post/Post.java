@@ -52,4 +52,8 @@ public class Post extends BaseEntity {
     public void liked() {
         this.likeCount++;
     }
+
+    public void unliked() {
+        this.likeCount--;
+    }
 }
