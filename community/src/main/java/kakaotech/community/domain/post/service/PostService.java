@@ -113,7 +113,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
 
-        if (post.isWrittenBy(userId)) {
+        if (!post.isWrittenBy(userId)) {
             throw new PostException(POST_WRITER_MISMATCH);
         }
 

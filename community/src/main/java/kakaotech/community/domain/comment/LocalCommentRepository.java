@@ -30,6 +30,7 @@ public class LocalCommentRepository implements CommentRepository {
             int index = comments.indexOf(comment);
             Comment preComment = comments.get(index);
             comments.set(index, preComment.update(comment));
+            return comment;
         }
 
         comment.assignId(idGenerator.getAndIncrement());

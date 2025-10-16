@@ -26,7 +26,7 @@ public enum ExceptionCode {
 
     // Post
     POST_NOT_FOUND("게시글을 찾을 수 없습니다", NOT_FOUND),
-    POST_WRITER_MISMATCH("작성 권한이 업습니다", FORBIDDEN),
+    POST_WRITER_MISMATCH("작성 권한이 없습니다", FORBIDDEN),
 
     // Image
     EMPTY_IMAGE("이미지가 비어있습니다.", BAD_REQUEST),
