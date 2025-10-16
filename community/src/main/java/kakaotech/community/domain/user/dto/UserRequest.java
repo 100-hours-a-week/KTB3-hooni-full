@@ -28,4 +28,6 @@ public class UserRequest {
             @Nullable MultipartFile image
     ) {
     }
+
+    public record ChangePw(@Password String password) {}
 }

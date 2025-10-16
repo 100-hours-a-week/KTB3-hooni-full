@@ -1,6 +1,7 @@
 package kakaotech.community.domain.user.controller;
 
 import jakarta.validation.Valid;
+import kakaotech.community.domain.common.validator.Password;
 import kakaotech.community.domain.user.dto.UserRequest;
 import kakaotech.community.domain.user.dto.UserResponse;
 import kakaotech.community.domain.user.port.Token;
@@ -38,5 +39,11 @@ public class UserController {
     public ResponseEntity<UserResponse.Update> changeProfile(@Authenticated Long userId,
                                              @Valid @ModelAttribute UserRequest.Update request) {
         return ResponseEntity.ok(userService.updateProfile(userId, request.nickname(), request.image()));
+    }
+
+    @PatchMapping("/me/change-password")
+    public ResponseEntity<?> changePassword(@Authenticated Long userId, @Valid @RequestBody UserRequest.ChangePw request) {
+        userService.changePassword(userId, request.password());
+        return ResponseEntity.noContent().build();
     }
 }

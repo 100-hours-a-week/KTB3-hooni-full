@@ -55,4 +55,8 @@ public class User extends BaseEntity {
     public void updateProfileImage(UUID uuid) {
         this.profileImageId = uuid;
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }

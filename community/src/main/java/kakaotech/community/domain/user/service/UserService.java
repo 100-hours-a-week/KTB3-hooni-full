@@ -74,4 +74,11 @@ public class UserService {
         user.updateProfileImage(uuid);
         userRepository.save(user);
     }
+
+    public void changePassword(Long userId, String password) {
+        User user = findById(userId);
+
+        user.updatePassword(password);
+        userRepository.save(user);
+    }
 }
