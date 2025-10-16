@@ -36,4 +36,11 @@ public class LocalCommentRepository implements CommentRepository {
     public Optional<Comment> findById(Long id) {
         return Optional.ofNullable(commentDatabase.get(id));
     }
+
+    @Override
+    public void delete(Comment comment) {
+        commentDatabase.remove(comment.getId());
+        List<Comment> comments = commentsByPostId.get(comment.getPostId());
+        comments.remove(comment);
+    }
 }

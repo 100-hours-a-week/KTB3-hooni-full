@@ -38,4 +38,17 @@ public class CommentService {
         Comment newComment = commentRepository.save(preComment.update(content));
         return new CommentResponse.Key(newComment.getId());
     }
+
+    public void delete(Long userId, Long postId, Long commentId) {
+        postService.validatePost(postId);
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(COMMENT_NOT_FOUND));
+
+        if (!comment.isWrittenBy(userId)) {
+            throw new CommentException(COMMENT_WRITER_MISMATCH);
+        }
+
+        commentRepository.delete(comment);
+    }
 }
