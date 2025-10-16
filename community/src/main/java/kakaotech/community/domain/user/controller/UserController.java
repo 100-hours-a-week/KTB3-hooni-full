@@ -6,10 +6,12 @@ import kakaotech.community.domain.user.dto.UserResponse;
 import kakaotech.community.domain.user.port.Token;
 import kakaotech.community.domain.user.service.AuthService;
 import kakaotech.community.domain.user.service.UserService;
+import kakaotech.community.global.auth.annotation.Authenticated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,5 +32,11 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponse.Join> join(@Valid @ModelAttribute UserRequest.Join request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.join(request.email(), request.password(), request.nickname(), request.image()));
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<UserResponse.Update> changeProfile(@Authenticated Long userId,
+                                             @Valid @ModelAttribute UserRequest.Update request) {
+        return ResponseEntity.ok(userService.updateProfile(userId, request.nickname(), request.image()));
     }
 }

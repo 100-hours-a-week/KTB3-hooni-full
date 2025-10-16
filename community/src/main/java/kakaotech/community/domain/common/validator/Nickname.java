@@ -14,7 +14,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {})
-@NotNull
 @Size(max = 10)
 @Pattern(regexp = "^[^\\s]+$")
 public @interface Nickname {

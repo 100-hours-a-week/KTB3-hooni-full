@@ -49,4 +49,29 @@ public class UserService {
     private boolean isDuplicatedNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
     }
+
+    public UserResponse.Update updateProfile(Long userId, String nickname, MultipartFile image) {
+        User user = findById(userId);
+
+        if (nickname != null) {
+            changeNickname(user, nickname);
+        }
+
+        if (image != null) {
+            changeProfileImage(user, image);
+        }
+
+        return new UserResponse.Update(user.getId(), user.getEmail(), user.getNickname(), user.getProfileImageId());
+    }
+
+    private void changeNickname(User user, String nickname) {
+        user.updateNickname(nickname);
+        userRepository.save(user);
+    }
+
+    private void changeProfileImage(User user, MultipartFile image) {
+        UUID uuid = imageService.updateImage(user.getProfileImageId(), image);
+        user.updateProfileImage(uuid);
+        userRepository.save(user);
+    }
 }
