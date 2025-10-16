@@ -29,6 +29,15 @@ public class Comment extends BaseEntity {
         this.id = id;
     }
 
+    public boolean isWrittenBy(Long userId) {
+        return this.writerId.equals(userId);
+    }
+
+    public Comment update(String content) {
+        this.content = content;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

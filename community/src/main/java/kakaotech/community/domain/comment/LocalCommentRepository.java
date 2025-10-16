@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -29,5 +30,10 @@ public class LocalCommentRepository implements CommentRepository {
         commentDatabase.put(comment.getId(), comment);
         commentsByPostId.computeIfAbsent(comment.getPostId(), k -> new LinkedList<>()).addFirst(comment);
         return comment;
+    }
+
+    @Override
+    public Optional<Comment> findById(Long id) {
+        return Optional.ofNullable(commentDatabase.get(id));
     }
 }

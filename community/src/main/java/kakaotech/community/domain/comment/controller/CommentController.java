@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,15 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<CommentResponse.Key> create(@Authenticated Long userId,
                                                       @PathVariable Long postId,
-                                                      @Valid @RequestBody CommentRequest.Create request) {
+                                                      @Valid @RequestBody CommentRequest.Write request) {
         return ResponseEntity.ok(commentService.create(userId, postId, request.content()));
+    }
+
+    @PutMapping("/{commentId}")
+    public ResponseEntity<CommentResponse.Key> update(@Authenticated Long userId,
+                                                      @PathVariable Long postId,
+                                                      @PathVariable Long commentId,
+                                                      @Valid @RequestBody CommentRequest.Write request) {
+        return ResponseEntity.ok(commentService.update(userId, postId, commentId, request.content()));
     }
 }

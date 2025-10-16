@@ -34,6 +34,10 @@ public enum ExceptionCode {
     IMAGE_NOT_FOUND("이미지를 찾을 수 없습니다.", BAD_REQUEST),
     FAILED_TO_UPLOAD_IMAGE("이미지 업로드 중 서버에서 문제 발생", INTERNAL_SERVER_ERROR),
 
+    // Comment
+    COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다", NOT_FOUND),
+    COMMENT_WRITER_MISMATCH("작성 권한이 없습니다", FORBIDDEN),
+
     ;
 
     private final String message;
