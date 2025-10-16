@@ -8,6 +8,7 @@ import kakaotech.community.global.auth.annotation.Authenticated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,5 +43,15 @@ public class CommentController {
                                     @PathVariable Long commentId) {
         commentService.delete(userId, postId, commentId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getComments(@PathVariable Long postId,
+                                         int cursor) {
+        if (cursor < 0) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(commentService.getCommentsByCursor(postId, cursor));
     }
 }

@@ -37,6 +37,7 @@ public enum ExceptionCode {
     // Comment
     COMMENT_NOT_FOUND("댓글을 찾을 수 없습니다", NOT_FOUND),
     COMMENT_WRITER_MISMATCH("작성 권한이 없습니다", FORBIDDEN),
+    INVALID_COMMENT_CURSOR("커서 값이 올바르지 않습니다", BAD_REQUEST),
 
     ;
 

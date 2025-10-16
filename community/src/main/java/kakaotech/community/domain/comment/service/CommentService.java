@@ -4,9 +4,13 @@ import kakaotech.community.domain.comment.Comment;
 import kakaotech.community.domain.comment.CommentRepository;
 import kakaotech.community.domain.comment.dto.CommentResponse;
 import kakaotech.community.domain.post.service.PostService;
+import kakaotech.community.domain.user.User;
+import kakaotech.community.domain.user.service.UserService;
 import kakaotech.community.global.exception.CommentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static kakaotech.community.global.exception.code.ExceptionCode.COMMENT_NOT_FOUND;
 import static kakaotech.community.global.exception.code.ExceptionCode.COMMENT_WRITER_MISMATCH;
@@ -15,6 +19,7 @@ import static kakaotech.community.global.exception.code.ExceptionCode.COMMENT_WR
 @RequiredArgsConstructor
 public class CommentService {
     private final PostService postService;
+    private final UserService userService;
 
     private final CommentRepository commentRepository;
 
@@ -50,5 +55,31 @@ public class CommentService {
         }
 
         commentRepository.delete(comment);
+    }
+
+    public CommentResponse.Details getCommentsByCursor(Long postId, int cursor) {
+        postService.validatePost(postId);
+
+        List<Comment> comments = commentRepository.findByPostIdAndCursor(postId, cursor);
+        boolean hasNext = commentRepository.hasNextComment(postId, comments.getLast());
+
+        return new CommentResponse.Details(
+                postId,
+                comments.stream()
+                        .map(comment -> {
+                                    User user = userService.findById(comment.getWriterId());
+                                    return new CommentResponse.Detail(
+                                            comment.getId(),
+                                            user.getId(),
+                                            user.getProfileImageId(),
+                                            user.getNickname(),
+                                            comment.getContent(),
+                                            comment.getCreatedAt()
+                                    );
+                                }
+
+                        ).toList(),
+                new CommentResponse.Paging(comments.getLast().getId(), hasNext)
+        );
     }
 }
