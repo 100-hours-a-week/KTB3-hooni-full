@@ -11,6 +11,7 @@ import kakaotech.community.global.auth.annotation.Authenticated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,12 @@ public class UserController {
     @PatchMapping("/me/change-password")
     public ResponseEntity<?> changePassword(@Authenticated Long userId, @Valid @RequestBody UserRequest.ChangePw request) {
         userService.changePassword(userId, request.password());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<?> delete(@Authenticated Long userId) {
+        userService.delete(userId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -81,4 +81,10 @@ public class UserService {
         user.updatePassword(password);
         userRepository.save(user);
     }
+
+    public void delete(Long userId) {
+        User user = findById(userId);
+
+        userRepository.delete(user);
+    }
 }

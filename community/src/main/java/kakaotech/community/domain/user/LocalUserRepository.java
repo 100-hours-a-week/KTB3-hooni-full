@@ -48,6 +48,11 @@ public class LocalUserRepository implements UserRepository {
                 .anyMatch(user -> user.isSameNickname(nickname));
     }
 
+    @Override
+    public synchronized void delete(User user) {
+        userDatabase.remove(user.getId());
+    }
+
     public void clear() {
         userDatabase.clear();
         idGenerator.set(1);
