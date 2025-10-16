@@ -120,4 +120,10 @@ public class PostService {
         imageService.delete(post.getImageId());
         postRepository.deleteById(postId);
     }
+
+    public void validatePost(Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new PostException(POST_NOT_FOUND);
+        }
+    }
 }
