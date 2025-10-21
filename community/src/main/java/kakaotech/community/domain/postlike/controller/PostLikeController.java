@@ -1,6 +1,7 @@
 package kakaotech.community.domain.postlike.controller;
 
 import kakaotech.community.domain.postlike.service.PostLikeService;
+import kakaotech.community.global.apidoc.PostLikeApiDocs;
 import kakaotech.community.global.auth.annotation.Authenticated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-public class PostLikeController {
+public class PostLikeController implements PostLikeApiDocs {
     private final PostLikeService postLikeService;
 
     @PutMapping("/posts/{postId}/like")
