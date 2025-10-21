@@ -68,16 +68,9 @@ public class CommentService {
                 comments.stream()
                         .map(comment -> {
                                     User user = userService.findById(comment.getWriterId());
-                                    return new CommentResponse.Detail(
-                                            comment.getId(),
-                                            user.getId(),
-                                            user.getProfileImageId(),
-                                            user.getNickname(),
-                                            comment.getContent(),
-                                            comment.getCreatedAt()
-                                    );
-                                }
 
+                                    return CommentMapper.toDetail(comment, user);
+                                }
                         ).toList(),
                 new CommentResponse.Paging(comments.getLast().getId(), hasNext)
         );
