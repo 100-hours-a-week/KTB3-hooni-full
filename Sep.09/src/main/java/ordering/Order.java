@@ -1,6 +1,7 @@
 package ordering;
 
 import common.message.GuidanceMessage;
+import java.util.List;
 
 public class Order {
     private static final String BILL_FORMAT = """
@@ -24,10 +25,26 @@ public class Order {
         return String.format(BILL_FORMAT, shoppingCart.getBillFormat(), shoppingCart.getTotalPrice());
     }
 
-    public int pay(int paidAmount) {
+    public int getTotalPrice() {
+        return shoppingCart.getTotalPrice();
+    }
+
+    public OrderPayResult pay(int paidAmount) {
         validateEnoughToPay(paidAmount);
 
-        return returnChange(paidAmount);
+        if (shoppingCart.isRemainingInStock()) {
+            shoppingCart.purchase();
+            return OrderPayResult.success(returnChange(paidAmount));
+        } else {
+            List<String> removedItemNames = shoppingCart.removeInsufficientItems();
+
+            if (shoppingCart.isEmpty()) {
+                return new OrderPayResult(OrderStatus.EMPTY_CART, paidAmount, removedItemNames);
+            }
+
+            shoppingCart.purchase();
+            return new OrderPayResult(OrderStatus.INSUFFICIENT_STOCK, returnChange(paidAmount), removedItemNames);
+        }
     }
 
     private void validateEnoughToPay(int paidAmount) {

@@ -8,13 +8,13 @@ public class Menu {
     private final List<MenuItem> menuItems;
 
     private Menu() {
-        menuItems = List.of(new MenuItem("데이터", 1, MenuType.Dummy), // 리스트 1부터 시작을 위한 더미데이터
-                new MenuItem("빅맥", 5000, MenuType.MainDish), new MenuItem("치즈버거", 2000, MenuType.MainDish),
-                new MenuItem("싸이버거", 4000, MenuType.MainDish), new MenuItem("와퍼", 4500, MenuType.MainDish),
-                new MenuItem("콜라", 1000, MenuType.Beverage), new MenuItem("사이다", 1000, MenuType.Beverage),
-                new MenuItem("제로콜라", 1500, MenuType.Beverage), new MenuItem("제로사이다", 1500, MenuType.Beverage),
-                new MenuItem("감자튀김", 1000, MenuType.SideDish), new MenuItem("치킨너겟", 2000, MenuType.SideDish),
-                new MenuItem("코울슬로", 2500, MenuType.SideDish), new MenuItem("치즈스틱", 1500, MenuType.SideDish)
+        menuItems = List.of(new MenuItem("데이터", 1, MenuType.Dummy, 0), // 리스트 1부터 시작을 위한 더미데이터
+                new MenuItem("빅맥", 5000, MenuType.MainDish, 2), new MenuItem("치즈버거", 2000, MenuType.MainDish, 8),
+                new MenuItem("싸이버거", 4000, MenuType.MainDish, 10), new MenuItem("와퍼", 4500, MenuType.MainDish, 12),
+                new MenuItem("콜라", 1000, MenuType.Beverage, 8), new MenuItem("사이다", 1000, MenuType.Beverage, 14),
+                new MenuItem("제로콜라", 1500, MenuType.Beverage, 12), new MenuItem("제로사이다", 1500, MenuType.Beverage, 6),
+                new MenuItem("감자튀김", 1000, MenuType.SideDish, 6), new MenuItem("치킨너겟", 2000, MenuType.SideDish, 6),
+                new MenuItem("코울슬로", 2500, MenuType.SideDish, 10), new MenuItem("치즈스틱", 1500, MenuType.SideDish, 3)
         );
     }
 

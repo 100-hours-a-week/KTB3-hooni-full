@@ -3,8 +3,10 @@ import common.io.OutputWriter;
 import menu.MenuItem;
 import menu.Menu;
 import ordering.Order;
+import ordering.OrderPayResult;
 import ordering.ShoppingCart;
 import common.message.GuidanceMessage;
+import ui.OrderProgressDisplay;
 import ui.TouchScreen;
 
 import static java.lang.System.exit;
@@ -21,6 +23,10 @@ public class Main {
             ShoppingCart shoppingCart = new ShoppingCart();
             Order order = new Order(shoppingCart);
 
+            OrderProgressDisplay orderDisplay = new OrderProgressDisplay(touchScreen, order);
+            Thread orderProgressThread = new Thread(orderDisplay);
+            orderProgressThread.start();
+
             touchScreen.show(GuidanceMessage.WELCOME_MESSAGE.getText());
             touchScreen.show(GuidanceMessage.YOU_SHOULD_ENTER_CHOICE_NUMBER.getText());
 
@@ -32,9 +38,9 @@ public class Main {
                 chooseMoreMenu(touchScreen, menu, shoppingCart);
             }
 
-            touchScreen.show(order.getBill());
             checkout(touchScreen, order);
 
+            orderDisplay.stop();
             touchScreen.show(GuidanceMessage.THANK_YOU_FOR_USING.getText());
             sleep(2);
         }
@@ -99,16 +105,24 @@ public class Main {
     }
 
     private static void checkout(TouchScreen touchScreen, Order order) {
-        touchScreen.show(GuidanceMessage.ENTER_MONEY.getText());
-
         while (true) {
+            touchScreen.show(GuidanceMessage.ENTER_MONEY.getText());
             int amount = touchScreen.inputNaturalNumber();
 
             try {
-                int change = order.pay(amount);
-                touchScreen.show(GuidanceMessage.RETURN_CHANGE_AMOUNT.getText() + " : " + change);
+                OrderPayResult result = order.pay(amount);
 
-                break;
+                if (result.isInsufficientStock()) {
+                    touchScreen.show(String.format(GuidanceMessage.REMOVE_INSUFFICIENT_ITEMS_AND_PAY.getText(), result.getInsufficientItems()));
+                } else if (result.isEmptyCart()) {
+                    touchScreen.show(
+                            String.format(GuidanceMessage.REMOVE_INSUFFICIENT_ITEMS_AND_PAY.getText(), result.getInsufficientItems()) + "\n" +
+                                    GuidanceMessage.NO_ITEMS_TO_CHECKOUT.getText());
+                }
+
+                touchScreen.show(GuidanceMessage.RETURN_CHANGE_AMOUNT.getText() + " : " + result.getChange());
+                return;
+
             } catch (IllegalArgumentException e) {
                 touchScreen.show(e);
             }

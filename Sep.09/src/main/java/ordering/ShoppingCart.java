@@ -2,14 +2,17 @@ package ordering;
 
 import menu.MenuItem;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ShoppingCart {
     private final Map<MenuItem, Integer> pickedMenus;
 
     public ShoppingCart() {
-        this.pickedMenus = new LinkedHashMap<>();
+        this.pickedMenus = Collections.synchronizedMap(new LinkedHashMap<>());
     }
 
     public void add(MenuItem menu) {
@@ -35,5 +38,49 @@ public class ShoppingCart {
         }
 
         return sb.toString();
+    }
+
+    public boolean isRemainingInStock() {
+        return pickedMenus.entrySet().stream()
+                .allMatch(entry -> {
+                    int quantity = entry.getValue();
+                    return entry.getKey().isEnoughStock(quantity);
+                });
+    }
+
+    public void purchase() {
+        pickedMenus.forEach((menuItem, quantity) -> menuItem.sell(quantity));
+    }
+
+    public List<String> removeInsufficientItems() {
+        List<String> removedItems = new ArrayList<>();
+
+        for (var entry : pickedMenus.entrySet()) {
+            MenuItem item = entry.getKey();
+            Integer buyingQuantity = entry.getValue();
+
+            if (item.isEnoughStock(buyingQuantity)) {
+                continue;
+            }
+
+            if (item.isSoldOut()) {
+                removedItems.add(item.getName());
+                pickedMenus.put(item, 0);
+            } else {
+                removedItems.add(item.getName());
+                pickedMenus.put(item, item.getStock());
+            }
+        }
+
+        return removedItems;
+    }
+
+    public boolean isEmpty() {
+        if (pickedMenus.isEmpty()) {
+            return true;
+        }
+
+        return pickedMenus.values().stream()
+                .allMatch(quantity -> quantity == 0);
     }
 }
