@@ -7,6 +7,7 @@ import kakaotech.community.domain.user.dto.UserResponse;
 import kakaotech.community.domain.user.port.Token;
 import kakaotech.community.domain.user.service.AuthService;
 import kakaotech.community.domain.user.service.UserService;
+import kakaotech.community.global.apidoc.UserApiDocs;
 import kakaotech.community.global.auth.annotation.Authenticated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserApiDocs {
     private final AuthService authService;
     private final UserService userService;
 

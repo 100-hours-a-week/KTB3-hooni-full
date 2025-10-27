@@ -38,7 +38,7 @@ public class UserService {
 
         UUID imageId = imageService.save(image);
 
-        Long userId = userRepository.save(new User(email, password, nickname, imageId));
+        Long userId = userRepository.save(UserMapper.toEntity(email, password, nickname, imageId));
         return new UserResponse.Join(userId);
     }
 
@@ -61,7 +61,7 @@ public class UserService {
             changeProfileImage(user, image);
         }
 
-        return new UserResponse.Update(user.getId(), user.getEmail(), user.getNickname(), user.getProfileImageId());
+        return UserMapper.toUpdated(user);
     }
 
     private void changeNickname(User user, String nickname) {

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import kakaotech.community.domain.post.dto.PostRequest;
 import kakaotech.community.domain.post.dto.PostResponse;
 import kakaotech.community.domain.post.service.PostService;
+import kakaotech.community.global.apidoc.PostApiDocs;
 import kakaotech.community.global.auth.annotation.Authenticated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/posts")
 @RequiredArgsConstructor
-public class PostController {
+public class PostController implements PostApiDocs {
     private final PostService postService;
 
     @PostMapping

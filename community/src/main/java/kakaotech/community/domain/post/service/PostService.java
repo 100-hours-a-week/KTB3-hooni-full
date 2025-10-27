@@ -58,17 +58,7 @@ public class PostService {
                         .map(post -> {
                                     User user = userService.findById(post.getWriterId());
 
-                                    return new PostResponse.Summary(
-                                            post.getId(),
-                                            post.getTitle(),
-                                            user.getId(),
-                                            user.getNickname(),
-                                            user.getProfileImageId(),
-                                            post.getLikeCount(),
-                                            post.getCommentCount(),
-                                            post.getViewCount(),
-                                            post.getCreatedAt()
-                                    );
+                                    return PostMapper.toSummary(post, user);
                                 }
                         ).toList(),
                 // totalSize 는 20개마다 1페이지씩 늘어남. (20개 -> 총 페이지 1, 39개 -> 1, 40개 -> 2 ...)
@@ -77,20 +67,9 @@ public class PostService {
     }
 
     private PostResponse.Detail toDetail(User user, Post post) {
-        return new PostResponse.Detail(
-                post.getId(),
-                post.getTitle(),
-                post.getContent(),
-                user.getId(),
-                user.getNickname(),
-                user.getProfileImageId(),
-                post.getImageId(),
-                post.getLikeCount(),
-                post.getCommentCount(),
-                post.getViewCount(),
-                post.getCreatedAt(),
-                postLikeQueryService.isLiked(post.getId(), user.getId())
-        );
+        boolean liked = postLikeQueryService.isLiked(post.getId(), user.getId());
+
+        return PostMapper.toDetail(user, post, liked);
     }
 
     public PostResponse.Detail update(Long userId, Long postId, String title, String content, MultipartFile image) {
