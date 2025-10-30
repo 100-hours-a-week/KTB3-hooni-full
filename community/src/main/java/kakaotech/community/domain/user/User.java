@@ -4,7 +4,6 @@ import kakaotech.community.global.entity.BaseEntity;
 import kakaotech.community.global.exception.AuthException;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kakaotech.community.global.exception.code.ExceptionCode.FAILED_TO_LOGIN;
@@ -23,7 +22,6 @@ public class User extends BaseEntity {
             String nickname,
             UUID profileImageId
     ) {
-        super(LocalDateTime.now());
         this.email = email;
         this.password = password;
         this.nickname = nickname;

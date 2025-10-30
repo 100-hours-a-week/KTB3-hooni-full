@@ -3,7 +3,6 @@ package kakaotech.community.domain.post;
 import kakaotech.community.global.entity.BaseEntity;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,7 +23,6 @@ public class Post extends BaseEntity {
             String content,
             UUID imageId
     ) {
-        super(LocalDateTime.now());
         this.writerId = writerId;
         this.title = title;
         this.content = content;

@@ -3,7 +3,6 @@ package kakaotech.community.domain.comment;
 import kakaotech.community.global.entity.BaseEntity;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -14,7 +13,6 @@ public class Comment extends BaseEntity {
     private String content;
 
     public Comment(Long writerId, Long postId, String content) {
-        super(LocalDateTime.now());
         this.writerId = writerId;
         this.postId = postId;
         this.content = content;
