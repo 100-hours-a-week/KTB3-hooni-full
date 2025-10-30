@@ -70,7 +70,7 @@ public class UserService {
     }
 
     private void changeProfileImage(User user, MultipartFile image) {
-        UUID uuid = imageService.updateImage(user.getProfileImageId(), image);
+        UUID uuid = imageService.updateImage(user.getProfileImage(), image);
         user.updateProfileImage(uuid);
         userRepository.save(user);
     }

@@ -4,6 +4,8 @@ import kakaotech.community.domain.post.Post;
 import kakaotech.community.domain.post.PostRepository;
 import kakaotech.community.domain.postlike.PostLike;
 import kakaotech.community.domain.postlike.PostLikeRepository;
+import kakaotech.community.domain.user.User;
+import kakaotech.community.domain.user.service.UserService;
 import kakaotech.community.global.exception.PostException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,19 +20,23 @@ import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_F
 public class PostLikeService {
     private final Lock lock = new ReentrantLock();
 
+    private final UserService userService;
+
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
     public void like(Long postId, Long userId) {
         lock.lock();
         try {
+            User user = userService.findById(userId);
+
             Post post = postRepository.findById(postId)
                     .orElseThrow(() -> new PostException(POST_NOT_FOUND));
 
             post.liked();
             postRepository.save(post);
 
-            postLikeRepository.save(new PostLike(postId, userId));
+            postLikeRepository.save(new PostLike(post, user));
         } finally {
             lock.unlock();
         }

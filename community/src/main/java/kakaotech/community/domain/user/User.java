@@ -1,20 +1,42 @@
 package kakaotech.community.domain.user;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import kakaotech.community.global.entity.BaseEntity;
 import kakaotech.community.global.exception.AuthException;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 import static kakaotech.community.global.exception.code.ExceptionCode.FAILED_TO_LOGIN;
 
+@Entity
+@Table(name = "users")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "password")
     private String password; // TODO. Encoding 필요
+
+    @Column(name = "nickname")
     private String nickname;
-    private UUID profileImageId;
+
+    @Column(name = "profile_image")
+    private UUID profileImage;
 
     public User(
             String email,
@@ -25,7 +47,7 @@ public class User extends BaseEntity {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.profileImageId = profileImageId;
+        this.profileImage = profileImageId;
     }
 
     boolean isSameEmail(String email) {
@@ -51,7 +73,7 @@ public class User extends BaseEntity {
     }
 
     public void updateProfileImage(UUID uuid) {
-        this.profileImageId = uuid;
+        this.profileImage = uuid;
     }
 
     public void updatePassword(String password) {

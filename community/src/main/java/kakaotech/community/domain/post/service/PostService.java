@@ -31,12 +31,12 @@ public class PostService {
         User user = userService.findById(userId);
         UUID imageId = imageService.save(image);
 
-        Post post = postRepository.save(new Post(userId, title, content, imageId));
+        Post post = postRepository.save(new Post(user, title, content, imageId));
 
         return toDetail(user, post);
     }
 
-    public PostResponse.Detail getPost(Long postId) {
+    public PostResponse.Detail getPostDetail(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
 
@@ -46,6 +46,11 @@ public class PostService {
         postRepository.save(post);
 
         return toDetail(writer, post);
+    }
+
+    public Post findById(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new PostException(POST_NOT_FOUND));
     }
 
     public PostResponse.Summaries getPostsByPaging(int page) {

@@ -38,7 +38,7 @@ public class PostController implements PostApiDocs {
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse.Detail> getPost(@PathVariable Long postId) {
-        return ResponseEntity.ok(postService.getPost(postId));
+        return ResponseEntity.ok(postService.getPostDetail(postId));
     }
 
     @PutMapping("/{postId}")
