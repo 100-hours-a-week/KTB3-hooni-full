@@ -13,15 +13,15 @@ public class LocalUserRepository implements UserRepository {
     private final AtomicLong idGenerator = new AtomicLong(1);
 
     @Override
-    public synchronized Long save(User user) {
+    public synchronized User save(User user) {
         if (user.getId() != null) {
             userDatabase.put(user.getId(), user);
-            return user.getId();
+            return user;
         }
 
         user.assignId(idGenerator.getAndIncrement());
         userDatabase.put(user.getId(), user);
-        return user.getId();
+        return user;
     }
 
     @Override

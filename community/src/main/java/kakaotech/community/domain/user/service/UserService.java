@@ -7,6 +7,7 @@ import kakaotech.community.domain.user.dto.UserResponse;
 import kakaotech.community.global.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
@@ -15,17 +16,20 @@ import static kakaotech.community.global.exception.code.ExceptionCode.DUPLICATED
 import static kakaotech.community.global.exception.code.ExceptionCode.USER_NOT_FOUND;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
     private final ImageService imageService;
 
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
@@ -38,8 +42,8 @@ public class UserService {
 
         UUID imageId = imageService.save(image);
 
-        Long userId = userRepository.save(UserMapper.toEntity(email, password, nickname, imageId));
-        return new UserResponse.Join(userId);
+        User user = userRepository.save(UserMapper.toEntity(email, password, nickname, imageId));
+        return new UserResponse.Join(user.getId());
     }
 
     private boolean isDuplicatedEmail(String email) {

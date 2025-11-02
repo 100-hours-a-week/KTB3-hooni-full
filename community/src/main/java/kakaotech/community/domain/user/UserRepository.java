@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    Long save(User user);
+    User save(User user);
 
     Optional<User> findByEmail(String email);
 
