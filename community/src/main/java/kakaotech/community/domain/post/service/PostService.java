@@ -10,6 +10,7 @@ import kakaotech.community.domain.user.service.UserService;
 import kakaotech.community.global.exception.PostException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_F
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_WRITER_MISMATCH;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PostService {
     private final UserService userService;
@@ -43,16 +45,17 @@ public class PostService {
         User writer = userService.findById(post.getWriterId());
 
         post.viewedOne();
-        postRepository.save(post);
 
         return toDetail(writer, post);
     }
 
+    @Transactional(readOnly = true)
     public Post findById(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(POST_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
     public PostResponse.Summaries getPostsByPaging(int page) {
         List<Post> posts = postRepository.findPostsByPaging(page);
 
@@ -72,7 +75,7 @@ public class PostService {
     }
 
     private PostResponse.Detail toDetail(User user, Post post) {
-        boolean liked = postLikeQueryService.isLiked(post.getId(), user.getId());
+        boolean liked = postLikeQueryService.isLiked(post, user);
 
         return PostMapper.toDetail(user, post, liked);
     }
@@ -105,6 +108,7 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 
+    @Transactional(readOnly = true)
     public void validatePost(Long postId) {
         if (!postRepository.existsById(postId)) {
             throw new PostException(POST_NOT_FOUND);
