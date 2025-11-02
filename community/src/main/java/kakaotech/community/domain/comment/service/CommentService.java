@@ -10,6 +10,7 @@ import kakaotech.community.domain.user.service.UserService;
 import kakaotech.community.global.exception.CommentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ import static kakaotech.community.global.exception.code.ExceptionCode.COMMENT_NO
 import static kakaotech.community.global.exception.code.ExceptionCode.COMMENT_WRITER_MISMATCH;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CommentService {
     private final PostService postService;
@@ -59,6 +61,7 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
+    @Transactional(readOnly = true)
     public CommentResponse.Details getCommentsByCursor(Long postId, int cursor) {
         postService.validatePost(postId);
 
