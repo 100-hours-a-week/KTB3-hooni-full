@@ -14,14 +14,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class LocalPostRepository implements PostRepository {
-    private final UserRepository userRepository;
 
     private final Map<Long, Post> postDatabase = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(1);
-
-    public LocalPostRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public synchronized Post save(Post post) {
@@ -36,7 +31,7 @@ public class LocalPostRepository implements PostRepository {
     }
 
     public Optional<Post> findById(Long id) {
-       return Optional.ofNullable(postDatabase.get(id));
+        return Optional.ofNullable(postDatabase.get(id));
     }
 
     public PageResult<PostSummaryProjection> findPostsByPaging(PageQuery pageQuery) {
@@ -51,13 +46,13 @@ public class LocalPostRepository implements PostRepository {
 
         if (fromIndex < toIndex) {
             return new PageResult<>(snapshot.subList(fromIndex, toIndex).stream()
-                    .map(post -> {
-                        return new PostSummaryProjection(
-                                post.getId(), post.getTitle(), post.getWriterId(),
-                                post.getWriter().getNickname(), post.getWriter().getProfileImage(),
-                                post.getLikeCount(), post.getCommentCount(), post.getViewCount(), post.getCreatedAt()
-                        );
-                    }).toList(),
+                    .map(post ->
+                            new PostSummaryProjection(
+                                    post.getId(), post.getTitle(), post.getWriterId(),
+                                    post.getWriter().getNickname(), post.getWriter().getProfileImage(),
+                                    post.getLikeCount(), post.getCommentCount(), post.getViewCount(), post.getCreatedAt()
+                            )
+                    ).toList(),
                     pageNum, pageSize, calculateTotalPage(totalSize, pageSize), totalSize);
         }
 
@@ -74,10 +69,6 @@ public class LocalPostRepository implements PostRepository {
 
     public boolean existsById(Long id) {
         return postDatabase.containsKey(id);
-    }
-
-    public int size() {
-        return postDatabase.size();
     }
 
     public void clear() {

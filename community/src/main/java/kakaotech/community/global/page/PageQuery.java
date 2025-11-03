@@ -5,7 +5,11 @@ public record PageQuery(
         int pageSize,
         SortSpec sort
 ) {
-    public PageQuery(int pageNum) {
-        this(pageNum, 20, new SortSpec("createdAt", SortSpec.Direction.DESC));
+    public static PageQuery offset(int pageNum) {
+        return new PageQuery(pageNum, 20, new SortSpec("createdAt", SortSpec.Direction.DESC));
+    }
+
+    public static PageQuery cursor() {
+        return new PageQuery(0, 20, new SortSpec("createdAt", SortSpec.Direction.DESC));
     }
 }

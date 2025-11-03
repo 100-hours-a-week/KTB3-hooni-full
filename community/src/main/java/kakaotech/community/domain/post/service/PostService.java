@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.stream.Collectors.toList;
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_FOUND;
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_WRITER_MISMATCH;
 
@@ -61,7 +60,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PageResult<PostResponse.Summary> getPostsByPaging(int page) {
-        PageResult<PostSummaryProjection> postSummaries = postRepository.findPostsByPaging(new PageQuery(page));
+        PageResult<PostSummaryProjection> postSummaries = postRepository.findPostsByPaging(PageQuery.offset(page));
 
         return new PageResult<>(toSummariesResponse(postSummaries.elements()),
                 postSummaries.pageNum(), postSummaries.pageSize(), postSummaries.totalPage(), postSummaries.totalSize());
