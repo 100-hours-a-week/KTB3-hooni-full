@@ -1,9 +1,10 @@
 package kakaotech.community.domain.comment;
 
 import kakaotech.community.global.exception.CommentException;
+import kakaotech.community.global.page.CursorResult;
+import kakaotech.community.global.page.PageQuery;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -52,11 +53,11 @@ public class LocalCommentRepository implements CommentRepository {
     }
 
     @Override
-    public List<Comment> findByPostIdAndCursor(Long postId, int cursor) {
+    public CursorResult<CommentDetailProjection> findByPostIdAndCursor(Long postId, int cursor, PageQuery pageQuery) {
         List<Comment> comments = commentsByPostId.getOrDefault(postId, List.of());
 
         if (comments.isEmpty()) {
-            return List.of();
+            return new CursorResult<>(List.of(), false);
         }
 
         int size = comments.size();
@@ -82,18 +83,24 @@ public class LocalCommentRepository implements CommentRepository {
         int endIndex = Math.min(startIndex + PAGE_SIZE, size);
 
         if (startIndex >= endIndex) {
-            return List.of();
+            return new CursorResult<>(List.of(), false);
         }
-        return new ArrayList<>(comments.subList(startIndex, endIndex));
+
+        List<Comment> pagedComments = comments.subList(startIndex, endIndex);
+        return new CursorResult<>(
+                pagedComments.stream()
+                        .map(comment ->
+                                new CommentDetailProjection(
+                                        comment.getId(), comment.getWriterId(),
+                                        comment.getWriter().getProfileImage(), comment.getWriter().getNickname(),
+                                        comment.getContent(), comment.getCreatedAt()
+                                )
+                        ).toList(),
+                hasNext(comments, pagedComments)
+        );
     }
 
-    @Override
-    public boolean hasNextComment(Long postId, Comment comment) {
-        List<Comment> comments = commentsByPostId.get(postId);
-        if (comments.isEmpty()) {
-            return false;
-        }
-
-        return !comments.getLast().equals(comment);
+    private boolean hasNext(List<Comment> originComments, List<Comment> pagedComments) {
+        return !originComments.getLast().equals(pagedComments.getLast());
     }
 }
