@@ -3,11 +3,14 @@ package kakaotech.community.domain.post.service;
 import kakaotech.community.domain.image.service.ImageService;
 import kakaotech.community.domain.post.Post;
 import kakaotech.community.domain.post.PostRepository;
+import kakaotech.community.domain.post.PostSummaryProjection;
 import kakaotech.community.domain.post.dto.PostResponse;
 import kakaotech.community.domain.postlike.service.PostLikeQueryService;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.domain.user.service.UserService;
 import kakaotech.community.global.exception.PostException;
+import kakaotech.community.global.page.PageQuery;
+import kakaotech.community.global.page.PageResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.stream.Collectors.toList;
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_FOUND;
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_WRITER_MISMATCH;
 
@@ -56,22 +60,20 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostResponse.Summaries getPostsByPaging(int page) {
-        List<Post> posts = postRepository.findPostsByPaging(page);
+    public PageResult<PostResponse.Summary> getPostsByPaging(int page) {
+        PageResult<PostSummaryProjection> postSummaries = postRepository.findPostsByPaging(new PageQuery(page));
 
-        int totalSize = postRepository.size();
+        return new PageResult<>(toSummariesResponse(postSummaries.elements()),
+                postSummaries.pageNum(), postSummaries.pageSize(), postSummaries.totalPage(), postSummaries.totalSize());
+    }
 
-        return new PostResponse.Summaries(
-                posts.stream()
-                        .map(post -> {
-                                    User user = userService.findById(post.getWriterId());
-
-                                    return PostMapper.toSummary(post, user);
-                                }
-                        ).toList(),
-                // totalSize 는 20개마다 1페이지씩 늘어남. (20개 -> 총 페이지 1, 39개 -> 1, 40개 -> 2 ...)
-                new PostResponse.Paging(page, 20, (totalSize % 20 == 0) ? totalSize / 20 : (totalSize / 20) + 1, totalSize)
-        );
+    private List<PostResponse.Summary> toSummariesResponse(List<PostSummaryProjection> projections) {
+        return projections.stream()
+                .map(p -> new PostResponse.Summary(
+                        p.postId(), p.title(), p.writerId(),
+                        p.writerName(), p.writerProfileImage(), p.likeCount(),
+                        p.commentCount(), p.viewCount(), p.createdAt()
+                )).toList();
     }
 
     private PostResponse.Detail toDetail(User user, Post post) {

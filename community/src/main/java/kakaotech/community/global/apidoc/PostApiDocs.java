@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kakaotech.community.domain.post.dto.PostRequest;
 import kakaotech.community.domain.post.dto.PostResponse;
+import kakaotech.community.global.page.PageResult;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "게시글 API")
@@ -93,7 +94,7 @@ public interface PostApiDocs {
                     )
             )
     })
-    ResponseEntity<PostResponse.Summaries> getPosts(@Parameter(required = true) int page);
+    ResponseEntity<PageResult<PostResponse.Summary>> getPostsByPaging(@Parameter(required = true) int page);
 
     @Operation(summary = "게시글 상세 조회")
     @ApiResponses({
