@@ -4,6 +4,7 @@ import kakaotech.community.domain.postlike.service.PostLikeService;
 import kakaotech.community.global.apidoc.PostLikeApiDocs;
 import kakaotech.community.global.auth.annotation.Authenticated;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,12 +21,12 @@ public class PostLikeController implements PostLikeApiDocs {
     @PutMapping("/posts/{postId}/like")
     public ResponseEntity<?> likePost(@Authenticated Long userId, @PathVariable Long postId) {
         postLikeService.like(postId, userId);
-        return ResponseEntity.ok(Map.of("result", "success"));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Map.of("result", "success"));
     }
 
     @DeleteMapping("/posts/{postId}/like")
     public ResponseEntity<?> unlikePost(@Authenticated Long userId, @PathVariable Long postId) {
         postLikeService.unlike(postId, userId);
-        return ResponseEntity.ok(Map.of("result", "success"));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Map.of("result", "success"));
     }
 }

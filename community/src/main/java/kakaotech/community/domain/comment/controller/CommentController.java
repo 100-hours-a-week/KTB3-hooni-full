@@ -7,6 +7,7 @@ import kakaotech.community.domain.comment.service.CommentService;
 import kakaotech.community.global.apidoc.CommentApiDocs;
 import kakaotech.community.global.auth.annotation.Authenticated;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class CommentController implements CommentApiDocs {
     public ResponseEntity<CommentResponse.Key> create(@Authenticated Long userId,
                                                       @PathVariable Long postId,
                                                       @Valid @RequestBody CommentRequest.Write request) {
-        return ResponseEntity.ok(commentService.create(userId, postId, request.content()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentService.create(userId, postId, request.content()));
     }
 
     @PatchMapping("/{commentId}")
