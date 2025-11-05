@@ -69,6 +69,7 @@ public class CommentService {
         PageQuery pageQuery = PageQuery.cursor();
 
         CursorResult<CommentDetailProjection> result = commentRepository.findByPostIdAndCursor(postId, cursor, pageQuery);
+        Long nextCursor = result.elements().isEmpty() ? 0L : result.elements().getLast().commentId();
 
         return new CommentResponse.Details(
                 postId,
@@ -80,7 +81,7 @@ public class CommentService {
                                     element.content(), element.createdAt()
                             )
                         ).toList(),
-                new CommentResponse.Paging(result.elements().getLast().commentId(), result.hasNext())
+                new CommentResponse.Paging(nextCursor, result.hasNext())
         );
     }
 }
