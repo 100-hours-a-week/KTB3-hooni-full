@@ -173,7 +173,8 @@ public interface PostApiDocs {
     })
     ResponseEntity<PostResponse.Detail> updatePost(@Parameter(hidden = true) Long userId, @Parameter(required = true) Long postId, PostRequest.Update request);
 
-    @Operation(summary = "게시글 삭제")
+    @Operation(summary = "게시글 삭제",
+            security = {@SecurityRequirement(name = "Bearer Auth")})
     @ApiResponses({
             @ApiResponse(
                     responseCode = "204",
