@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,5 +54,10 @@ public class UserController implements UserApiDocs {
     public ResponseEntity<?> delete(@Authenticated Long userId) {
         userService.delete(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse.Profile> getProfile(@Authenticated Long userId) {
+        return ResponseEntity.ok(userService.getMyProfile(userId));
     }
 }

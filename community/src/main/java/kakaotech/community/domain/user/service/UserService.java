@@ -91,4 +91,15 @@ public class UserService {
 
         userRepository.delete(user);
     }
+
+    @Transactional(readOnly = true)
+    public UserResponse.Profile getMyProfile(Long userId) {
+        User user = findById(userId);
+        return new UserResponse.Profile(
+                user.getId(),
+                user.getEmail(),
+                user.getNickname(),
+                user.getProfileImage()
+        );
+    }
 }

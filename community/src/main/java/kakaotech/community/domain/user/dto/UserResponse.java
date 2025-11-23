@@ -14,4 +14,12 @@ public class UserResponse {
             UUID profileImage
     ) {
     }
+
+    public record Profile(
+            Long userId,
+            String email,
+            String nickname,
+            UUID profileImage
+    ) {
+    }
 }
