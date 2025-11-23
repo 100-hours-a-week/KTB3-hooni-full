@@ -40,7 +40,7 @@ public class PostJpaAdapter implements PostRepository {
 
         Page<PostSummaryProjection> pagedPosts = postJpaRepository.findPostSummaries(pageable);
 
-        return new PageResult<>(pagedPosts.toList(), pagedPosts.getNumber(), pagedPosts.getSize(), pagedPosts.getTotalPages(), pagedPosts.getNumberOfElements());
+        return new PageResult<>(pagedPosts.toList(), pagedPosts.getNumber() + 1, pagedPosts.getNumberOfElements(), pagedPosts.getTotalPages(), pagedPosts.getTotalElements());
     }
 
     @Override

@@ -6,7 +6,7 @@ public record PageQuery(
         SortSpec sort
 ) {
     public static PageQuery offset(int pageNum) {
-        return new PageQuery(pageNum, 20, new SortSpec("createdAt", SortSpec.Direction.DESC));
+        return new PageQuery(pageNum - 1, 20, new SortSpec("createdAt", SortSpec.Direction.DESC));
     }
 
     public static PageQuery cursor() {
