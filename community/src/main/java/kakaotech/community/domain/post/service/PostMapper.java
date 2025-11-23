@@ -14,7 +14,7 @@ public class PostMapper {
                 user.getId(),
                 user.getNickname(),
                 user.getProfileImage(),
-                post.getImageId(),
+                post.getImageId() == null ? null : post.getImageId(),
                 post.getLikeCount(),
                 post.getCommentCount(),
                 post.getViewCount(),

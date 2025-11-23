@@ -32,7 +32,7 @@ public class Post extends BaseEntity {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "image_id")
+    @Column(name = "image_id", nullable = true)
     private UUID imageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -61,6 +61,14 @@ public class Post extends BaseEntity {
         this.likeCount = 0L;
         this.commentCount = 0L;
         this.viewCount = 0L;
+    }
+
+    public Post(
+            User writer,
+            String title,
+            String content
+    ) {
+        this(writer, title, content, null);
     }
 
     void assignId(Long id) {

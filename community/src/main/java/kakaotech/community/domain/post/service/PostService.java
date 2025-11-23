@@ -34,10 +34,14 @@ public class PostService {
 
     public PostResponse.Detail create(Long userId, String title, String content, MultipartFile image) {
         User user = userService.findById(userId);
+
+        if (image == null) {
+            Post post = postRepository.save(new Post(user, title, content));
+            return toDetail(user, post);
+        }
         UUID imageId = imageService.save(image);
 
         Post post = postRepository.save(new Post(user, title, content, imageId));
-
         return toDetail(user, post);
     }
 
@@ -82,16 +86,20 @@ public class PostService {
     }
 
     public PostResponse.Detail update(Long userId, Long postId, String title, String content, MultipartFile image) {
-        Post prePost = postRepository.findById(postId)
-                .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+        Post prePost = findById(postId);
 
         if (!prePost.isWrittenBy(userId)) {
             throw new PostException(POST_WRITER_MISMATCH);
         }
 
-        UUID newImageId = imageService.updateImage(prePost.getImageId(), image);
+        Post newPost;
+        if (image != null) {
+            UUID newImageId = imageService.updateImage(prePost.getImageId(), image);
+            newPost = prePost.update(title, content, newImageId);
+        } else {
+            newPost = prePost.update(title, content, null);
+        }
 
-        Post newPost = postRepository.save(prePost.update(title, content, newImageId));
         User user = userService.findById(userId);
 
         return toDetail(user, newPost);
@@ -105,7 +113,9 @@ public class PostService {
             throw new PostException(POST_WRITER_MISMATCH);
         }
 
-        imageService.delete(post.getImageId());
+        if (post.getImageId() != null) {
+            imageService.delete(post.getImageId());
+        }
         postRepository.deleteById(postId);
     }
 
