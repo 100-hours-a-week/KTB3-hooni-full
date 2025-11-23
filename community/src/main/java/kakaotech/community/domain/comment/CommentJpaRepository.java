@@ -17,7 +17,7 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
                 u.nickname, c.content, c.createdAt
                 )
         FROM Comment c LEFT JOIN User u ON c.writer.id = u.id
-        WHERE c.post.id =  :postId AND (:cursor = 0 OR :cursor < c.id)
+        WHERE c.post.id =  :postId AND (:cursor = 0 OR :cursor > c.id)
         """)
     Slice<CommentDetailProjection> findCommentDetailsByPostId(Long postId, int cursor, Pageable pageable);
 }
