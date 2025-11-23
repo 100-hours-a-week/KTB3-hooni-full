@@ -58,32 +58,21 @@ public class UserService {
         User user = findById(userId);
 
         if (nickname != null) {
-            changeNickname(user, nickname);
+            user.updateNickname(nickname);
         }
 
         if (image != null) {
-            changeProfileImage(user, image);
+            UUID uuid = imageService.updateImage(user.getProfileImage(), image);
+            user.updateProfileImage(uuid);
         }
 
         return UserMapper.toUpdated(user);
-    }
-
-    private void changeNickname(User user, String nickname) {
-        user.updateNickname(nickname);
-        userRepository.save(user);
-    }
-
-    private void changeProfileImage(User user, MultipartFile image) {
-        UUID uuid = imageService.updateImage(user.getProfileImage(), image);
-        user.updateProfileImage(uuid);
-        userRepository.save(user);
     }
 
     public void changePassword(Long userId, String password) {
         User user = findById(userId);
 
         user.updatePassword(password);
-        userRepository.save(user);
     }
 
     public void delete(Long userId) {
