@@ -36,7 +36,7 @@ public class UserService {
     }
 
     public UserResponse.Join join(String email, String password, String nickname, MultipartFile image) {
-        if (isDuplicatedEmail(email) | isDuplicatedNickname(nickname)) {
+        if (isDuplicatedEmail(email) || isDuplicatedNickname(nickname)) {
             throw new UserException(DUPLICATED_EMAIL_OR_NICKNAME);
         }
 
