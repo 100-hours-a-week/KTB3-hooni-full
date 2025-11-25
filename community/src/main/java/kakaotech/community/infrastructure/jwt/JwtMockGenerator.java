@@ -9,6 +9,6 @@ public class JwtMockGenerator implements TokenGenerator {
 
     @Override
     public Token login(Long userId) {
-        return new Token(String.valueOf(userId));
+        return new Token(String.valueOf(userId), String.valueOf(userId));
     }
 }
