@@ -1,4 +1,4 @@
-package kakaotech.community.infrastructure.jwt;
+package kakaotech.community.infrastructure.token.jwt;
 
 import kakaotech.community.domain.user.port.Token;
 import kakaotech.community.domain.user.port.TokenGenerator;
