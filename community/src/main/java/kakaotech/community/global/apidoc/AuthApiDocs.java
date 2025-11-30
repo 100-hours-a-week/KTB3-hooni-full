@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import kakaotech.community.domain.user.dto.UserRequest;
 import kakaotech.community.domain.user.port.Token;
 import org.springframework.http.ResponseEntity;
@@ -50,5 +51,7 @@ public interface AuthApiDocs {
                     description = "비밀번호 인증 실패"
             )
     })
-    ResponseEntity<Token> login(UserRequest.Login request);
+    ResponseEntity<?> login(UserRequest.Login request, HttpServletResponse response);
+
+    ResponseEntity<?> reissue(String refreshToken, HttpServletResponse response);
 }

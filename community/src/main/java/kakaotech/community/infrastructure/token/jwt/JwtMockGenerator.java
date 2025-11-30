@@ -11,4 +11,9 @@ public class JwtMockGenerator implements TokenGenerator {
     public Token login(Long userId) {
         return new Token(String.valueOf(userId), String.valueOf(userId));
     }
+
+    @Override
+    public Token reissue(String refreshToken) {
+        return null;
+    }
 }

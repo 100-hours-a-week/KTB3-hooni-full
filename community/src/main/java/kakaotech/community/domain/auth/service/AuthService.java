@@ -25,4 +25,8 @@ public class AuthService {
 
         return tokenGenerator.login(user.getId());
     }
+
+    public Token reissue(String refreshToken) {
+        return tokenGenerator.reissue(refreshToken);
+    }
 }

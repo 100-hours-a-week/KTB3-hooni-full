@@ -24,6 +24,7 @@ public enum ExceptionCode {
     AUTH_TOKEN_NOT_FOUND("인증 토큰을 찾을 수 없습니다", UNAUTHORIZED),
     INVALID_AUTH_TOKEN("유효하지 않은 토큰입니다.", UNAUTHORIZED),
     AUTH_REQUIRED_REQUEST("인증이 필요한 요청입니다", UNAUTHORIZED),
+    RE_LOGIN_REQUIRED("로그인 세션이 만료되었습니다. 재로그인해주세요", UNAUTHORIZED),
 
     // Post
     POST_NOT_FOUND("게시글을 찾을 수 없습니다", NOT_FOUND),

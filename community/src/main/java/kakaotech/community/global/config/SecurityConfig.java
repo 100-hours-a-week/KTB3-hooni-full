@@ -18,7 +18,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private static final String[] ALLOWED_URL_LIST = new String[]{"/swagger**", "/auth/login", "/users"};
+    private static final String[] ALLOWED_URL_LIST = new String[]{"/swagger**", "/auth/**", "/users"};
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;

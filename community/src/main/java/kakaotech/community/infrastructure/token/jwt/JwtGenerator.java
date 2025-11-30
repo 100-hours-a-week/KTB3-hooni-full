@@ -24,6 +24,14 @@ public class JwtGenerator implements TokenGenerator {
         return new Token(generateAccessToken(userId), refreshTokenService.issue(userId));
     }
 
+    @Override
+    public Token reissue(String refreshToken) {
+        String newPayload = refreshTokenService.reissue(refreshToken);
+        Long userId = refreshTokenService.parseUserId(newPayload);
+
+        return new Token(generateAccessToken(userId), newPayload);
+    }
+
     private String generateAccessToken(Long userId) {
         Claims claims = Jwts.claims()
                 .subject(String.valueOf(userId))
