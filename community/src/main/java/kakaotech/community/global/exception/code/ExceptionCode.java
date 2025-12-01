@@ -41,6 +41,8 @@ public enum ExceptionCode {
     COMMENT_WRITER_MISMATCH("작성 권한이 없습니다", FORBIDDEN),
     INVALID_COMMENT_CURSOR("커서 값이 올바르지 않습니다", BAD_REQUEST),
 
+    // Common
+    INVALID_ARGUMENT("잘못된 인자로 요청했습니다", BAD_REQUEST);
     ;
 
     private final String message;
