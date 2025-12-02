@@ -3,7 +3,10 @@ package kakaotech.community.domain.user;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kakaotech.community.domain.image.service.ImageService;
+import kakaotech.community.domain.user.dto.UserRequest;
+import kakaotech.community.domain.user.port.encode.Encoder;
 import kakaotech.community.global.common.Fixtures;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,10 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static kakaotech.community.global.exception.code.ExceptionCode.DUPLICATED_EMAIL_OR_NICKNAME;
 import static kakaotech.community.global.exception.code.ExceptionCode.INVALID_ARGUMENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,6 +54,18 @@ public class UserAcceptanceTest {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private Encoder encoder;
+
+    private User user;
+    private String accessToken;
+
+    @BeforeEach
+    void setUp() {
+        user = fixtures.사용자_생성();
+        accessToken = fixtures.토큰_발행(user);
+    }
 
     @Nested
     class 회원가입_테스트 {
@@ -192,9 +209,6 @@ public class UserAcceptanceTest {
     class 프로필_변경_테스트 {
         private final String url = "/users/me";
 
-        private User user = fixtures.사용자_생성();
-        private String accessToken = fixtures.토큰_발행(user);
-
         @Test
         void 둘다_변경_성공() throws Exception {
             // given
@@ -286,10 +300,10 @@ public class UserAcceptanceTest {
         void 변경_실패_닉네임_형식_틀림(String newNickname) throws Exception {
             // when
             mockMvc.perform(
-                    multipart(HttpMethod.PATCH, url)
-                            .param("nickname", newNickname)
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-            )
+                            multipart(HttpMethod.PATCH, url)
+                                    .param("nickname", newNickname)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message").value(INVALID_ARGUMENT.getMessage()));
 
@@ -298,7 +312,43 @@ public class UserAcceptanceTest {
 
     @Nested
     class 비밀번호_변경_테스트 {
+        private final String url = "/users/me/change-password";
 
+        @Test
+        void 변경_성공() throws Exception {
+            // given
+            String newPassword = "q1w2e3r4!@QW";
+            UserRequest.ChangePw request = new UserRequest.ChangePw(newPassword);
+
+            // when
+            mockMvc.perform(
+                            patch(url)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request))
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isNoContent());
+
+            // then
+            assertThat(encoder.matches(newPassword, user.getPassword())).isTrue();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"@As12", "abcdef12345", "", " "})
+        void 변경_실패_잘못된_형식(String wrongPw) throws Exception {
+            // given
+            UserRequest.ChangePw request = new UserRequest.ChangePw(wrongPw);
+
+            // when then
+            mockMvc.perform(
+                    patch(url)
+                            .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(INVALID_ARGUMENT.getMessage())
+            );
+        }
     }
 
     @Nested
