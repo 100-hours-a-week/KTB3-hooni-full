@@ -29,9 +29,9 @@ import static kakaotech.community.global.exception.code.ExceptionCode.INVALID_AR
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_FOUND;
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_WRITER_MISMATCH;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -464,7 +464,45 @@ public class PostAcceptanceTest {
 
     @Nested
     class 게시글_단건_조회_테스트 {
+        private final String url = "/posts/{postId}";
 
+        @Test
+        void 조회_성공() throws Exception {
+            // given
+            Post post = fixtures.게시글_생성(user);
+
+            Long preViewCount = post.getViewCount();
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            get(url, post.getId())
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertAll(
+                    () -> assertThat(root.get("postId").asLong()).isEqualTo(post.getId()),
+                    () -> assertThat(root.get("viewCount").asLong()).isGreaterThan(preViewCount)
+            );
+        }
+
+        @Test
+        void 조회_실패_존재하지_않은_게시글_ID() throws Exception {
+            // given
+            Long wrongPostId = 9999L;
+            assertThat(postRepository.existsById(wrongPostId)).isFalse();
+
+            // when
+            mockMvc.perform(
+                    get(url, wrongPostId)
+            )
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
+        }
     }
 
     @Nested
