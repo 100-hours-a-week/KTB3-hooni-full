@@ -20,7 +20,7 @@ public class UserRequest {
             @Email String email,
             @Password String password,
             @Nickname @NotNull String nickname,
-            @NotNull MultipartFile image
+            MultipartFile image
     ) {
     }
 
