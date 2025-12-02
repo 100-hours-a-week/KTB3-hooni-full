@@ -29,7 +29,9 @@ import static kakaotech.community.global.exception.code.ExceptionCode.INVALID_AR
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_FOUND;
 import static kakaotech.community.global.exception.code.ExceptionCode.POST_WRITER_MISMATCH;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -148,11 +150,11 @@ public class PostAcceptanceTest {
 
             // when
             mockMvc.perform(
-                    multipart(url)
-                            .param("title", title)
-                            .param("content", content)
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-            )
+                            multipart(url)
+                                    .param("title", title)
+                                    .param("content", content)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message").value(INVALID_ARGUMENT.getMessage()));
         }
@@ -165,11 +167,11 @@ public class PostAcceptanceTest {
 
             // when
             mockMvc.perform(
-                    multipart(url)
-                            .param("title", title)
-                            .param("content", content)
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-            )
+                            multipart(url)
+                                    .param("title", title)
+                                    .param("content", content)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message").value(INVALID_ARGUMENT.getMessage()));
         }
@@ -327,11 +329,11 @@ public class PostAcceptanceTest {
 
             // when
             mockMvc.perform(
-                    multipart(HttpMethod.PUT, url, post.getId())
-                            .param("title", title)
-                            .param("content", post.getContent())
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-            )
+                            multipart(HttpMethod.PUT, url, post.getId())
+                                    .param("title", title)
+                                    .param("content", post.getContent())
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message").value(INVALID_ARGUMENT.getMessage()));
         }
@@ -380,11 +382,11 @@ public class PostAcceptanceTest {
 
             // when
             mockMvc.perform(
-                    multipart(HttpMethod.PUT, url, wrongId)
-                            .param("title", "title")
-                            .param("content", "content")
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-            )
+                            multipart(HttpMethod.PUT, url, wrongId)
+                                    .param("title", "title")
+                                    .param("content", "content")
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
         }
@@ -397,11 +399,11 @@ public class PostAcceptanceTest {
 
             // when
             mockMvc.perform(
-                    multipart(HttpMethod.PUT, url, notMyPost.getId())
-                            .param("title", "title")
-                            .param("content", "content")
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-            )
+                            multipart(HttpMethod.PUT, url, notMyPost.getId())
+                                    .param("title", "title")
+                                    .param("content", "content")
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
                     .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.message").value(POST_WRITER_MISMATCH.getMessage()));
         }
@@ -409,20 +411,54 @@ public class PostAcceptanceTest {
 
     @Nested
     class 게시글_삭제_테스트 {
+        private final String url = "/posts/{postId}";
 
         @Test
-        void 삭제_성공() {
+        void 삭제_성공() throws Exception {
+            // given
+            Post post = fixtures.게시글_생성(user);
 
+            // when
+            mockMvc.perform(
+                            delete(url, post.getId())
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isNoContent());
+
+            assertThat(postRepository.existsById(post.getId())).isFalse();
         }
 
         @Test
         void 삭제_실패_잘못된_게시글_ID() throws Exception {
+            // given
+            Long wrongPostId = 9999L;
+            assertThat(postRepository.existsById(wrongPostId)).isFalse();
 
+            // when
+            mockMvc.perform(
+                            delete(url, wrongPostId)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
         }
 
         @Test
         void 삭제_실패_삭제_권한_없는_타인의_게시글() throws Exception {
+            // given
+            User notMe = fixtures.다른_사용자_생성();
+            Post notMyPost = fixtures.게시글_생성(notMe);
 
+            // when
+            mockMvc.perform(
+                            delete(url, notMyPost.getId())
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(POST_WRITER_MISMATCH.getMessage()));
+
+            // then
+            assertThat(postRepository.existsById(notMyPost.getId())).isTrue();
         }
     }
 
