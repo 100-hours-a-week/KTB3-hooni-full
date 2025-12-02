@@ -1,32 +1,34 @@
 package kakaotech.community.domain.user;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kakaotech.community.domain.image.service.ImageService;
 import kakaotech.community.global.common.Fixtures;
-import kakaotech.community.global.exception.code.ExceptionCode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static kakaotech.community.global.exception.code.ExceptionCode.INVALID_ARGUMENT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,6 +46,9 @@ public class UserAcceptanceTest {
 
     @Autowired
     private Fixtures fixtures;
+
+    @Autowired
+    private ImageService imageService;
 
     @Nested
     class 회원가입_테스트 {
@@ -184,8 +189,111 @@ public class UserAcceptanceTest {
     }
 
     @Nested
-    class 프로필_이미지_변경_테스트 {
+    class 프로필_변경_테스트 {
+        private final String url = "/users/me";
 
+        private User user = fixtures.사용자_생성();
+        private String accessToken = fixtures.토큰_발행(user);
+
+        @Test
+        void 둘다_변경_성공() throws Exception {
+            // given
+            String newNickname = "newNick";
+            byte[] image = "my new Image".getBytes();
+            MockMultipartFile newImage = new MockMultipartFile(
+                    "image",
+                    "newImage.png",
+                    MediaType.IMAGE_PNG_VALUE,
+                    image
+            );
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            multipart(HttpMethod.PATCH, url)
+                                    .file(newImage)
+                                    .param("nickname", newNickname)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            UUID imageId = UUID.fromString(root.get("profileImage").asText());
+            byte[] imageBytes = imageService.load(imageId).resource().getContentAsByteArray();
+
+            assertAll(
+                    () -> assertThat(imageBytes).isEqualTo(image),
+                    () -> assertThat(root.get("nickname").asText()).isEqualTo(newNickname)
+            );
+        }
+
+        @Test
+        void 이미지만_변경_성공() throws Exception {
+            // given
+            String newNickname = "newNick";
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            multipart(HttpMethod.PATCH, url)
+                                    .param("nickname", newNickname)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertThat(root.get("nickname").asText()).isEqualTo(newNickname);
+        }
+
+        @Test
+        void 닉네임만_변경_성공() throws Exception {
+            // given
+            byte[] image = "my new Image".getBytes();
+            MockMultipartFile newImage = new MockMultipartFile(
+                    "image",
+                    "newImage.png",
+                    MediaType.IMAGE_PNG_VALUE,
+                    image
+            );
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            multipart(HttpMethod.PATCH, url)
+                                    .file(newImage)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            UUID imageId = UUID.fromString(root.get("profileImage").asText());
+            byte[] imageBytes = imageService.load(imageId).resource().getContentAsByteArray();
+
+            assertThat(imageBytes).isEqualTo(image);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"new nick", "newNickname"})
+        void 변경_실패_닉네임_형식_틀림(String newNickname) throws Exception {
+            // when
+            mockMvc.perform(
+                    multipart(HttpMethod.PATCH, url)
+                            .param("nickname", newNickname)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            )
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(INVALID_ARGUMENT.getMessage()));
+
+        }
     }
 
     @Nested
