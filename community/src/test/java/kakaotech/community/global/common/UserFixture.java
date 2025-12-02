@@ -21,4 +21,8 @@ public class UserFixture {
     static User one(UUID imageId) {
         return one(null, null, null, imageId);
     }
+
+    static User another(UUID imageId) {
+        return one("email2@email.com", "@ASDasd123", "test2", imageId);
+    }
 }

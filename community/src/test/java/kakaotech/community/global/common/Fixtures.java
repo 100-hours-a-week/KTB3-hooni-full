@@ -1,6 +1,8 @@
 package kakaotech.community.global.common;
 
 import kakaotech.community.domain.image.ImageStorage;
+import kakaotech.community.domain.post.Post;
+import kakaotech.community.domain.post.PostRepository;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.domain.user.UserRepository;
 import kakaotech.community.domain.user.port.TokenGenerator;
@@ -22,6 +24,9 @@ public final class Fixtures {
     @Autowired
     private ImageStorage imageStorage;
 
+    @Autowired
+    private PostRepository postRepository;
+
     // 사용자
     public String 토큰_발행(User user) {
         return tokenGenerator.login(user.getId()).getAccessToken();
@@ -36,6 +41,11 @@ public final class Fixtures {
         return userRepository.save(UserFixture.one(imageId));
     }
 
+    public User 다른_사용자_생성() {
+        UUID imageId = 이미지_생성();
+        return userRepository.save(UserFixture.another(imageId));
+    }
+
     // 이미지
     public UUID 이미지_생성() {
         UUID uuid = UUID.randomUUID();
@@ -47,6 +57,16 @@ public final class Fixtures {
         );
 
         return imageStorage.upload(uuid, image);
+    }
+
+    // 게시글
+    public Post 게시글_생성(User user) {
+        UUID imageId = 이미지_생성();
+        return postRepository.save(PostFixture.one(user, imageId));
+    }
+
+    public Post 게시글_생성_이미지_없는(User user) {
+        return postRepository.save(PostFixture.oneWithoutImage(user));
     }
 
 }
