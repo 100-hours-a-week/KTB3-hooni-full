@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kakaotech.community.domain.image.service.ImageService;
 import kakaotech.community.domain.user.dto.UserRequest;
 import kakaotech.community.domain.user.port.encode.Encoder;
+import kakaotech.community.domain.user.service.UserService;
 import kakaotech.community.global.common.Fixtures;
+import kakaotech.community.global.exception.UserException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,7 +33,10 @@ import java.util.stream.Stream;
 import static kakaotech.community.global.exception.code.ExceptionCode.DUPLICATED_EMAIL_OR_NICKNAME;
 import static kakaotech.community.global.exception.code.ExceptionCode.INVALID_ARGUMENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -54,6 +59,9 @@ public class UserAcceptanceTest {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private Encoder encoder;
@@ -341,23 +349,63 @@ public class UserAcceptanceTest {
 
             // when then
             mockMvc.perform(
-                    patch(url)
-                            .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))
-                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                            patch(url)
+                                    .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request))
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                     )
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message").value(INVALID_ARGUMENT.getMessage())
-            );
+                    );
         }
     }
 
     @Nested
     class 계정_삭제_테스트 {
+        private final String url = "/users/me";
 
+        @Test
+        void 삭제_성공() throws Exception {
+            // given
+            // BeforeEach 구문에서 미리 사용자 생성
+
+            // when
+            mockMvc.perform(
+                            delete(url)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isNoContent());
+
+            // then
+            assertThatThrownBy(() -> userService.findById(user.getId()))
+                    .isInstanceOf(UserException.class);
+        }
     }
 
     @Nested
     class 나의_프로필_조회_테스트 {
+        private final String url = "/users/me";
 
+        @Test
+        void 조회_성공() throws Exception {
+            // given
+            // BeforeEach 구문에서 사용자 미리 생성
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            get(url)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertAll(
+                    () -> assertThat(root.get("email").asText()).isEqualTo(user.getEmail()),
+                    () -> assertThat(root.get("nickname").asText()).isEqualTo(user.getNickname()),
+                    () -> assertThat(root.get("userId").asLong()).isEqualTo(user.getId())
+            );
+        }
     }
 }
