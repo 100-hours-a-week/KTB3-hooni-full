@@ -1,6 +1,7 @@
 package kakaotech.community.global.common;
 
 import kakaotech.community.domain.comment.Comment;
+import kakaotech.community.domain.comment.CommentJpaRepository;
 import kakaotech.community.domain.comment.CommentRepository;
 import kakaotech.community.domain.image.ImageStorage;
 import kakaotech.community.domain.post.Post;
@@ -31,7 +32,7 @@ public final class Fixtures {
     private PostJpaRepository postRepository;
 
     @Autowired
-    private CommentRepository commentRepository;
+    private CommentJpaRepository commentRepository;
 
     // 사용자
     public String 토큰_발행(User user) {
@@ -83,5 +84,9 @@ public final class Fixtures {
     // 댓글
     public Comment 댓글_생성(Post post, User user) {
         return commentRepository.save(CommentFixture.one(post, user));
+    }
+
+    public List<Comment> 댓글_여러개_생성(Post post, User user, int size) {
+        return commentRepository.saveAll(CommentFixture.many(post, user, size));
     }
 }
