@@ -29,8 +29,10 @@ import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_F
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -255,5 +257,90 @@ public class CommentAcceptanceTest {
                     .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.message").value(COMMENT_WRITER_MISMATCH.getMessage()));
         }
+    }
+
+    @Nested
+    class 댓글_삭제_테스트 {
+        private final String url = "/posts/{postId}/comments/{commentId}";
+
+        @Test
+        void 삭제_성공() throws Exception {
+            // given
+            Comment comment = fixtures.댓글_생성(post, user);
+            assertThat(commentRepository.findById(comment.getId()).isPresent()).isTrue();
+
+            // when
+            mockMvc.perform(
+                    delete(url, post.getId(), comment.getId())
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            )
+                    .andExpect(status().isNoContent());
+
+            // then
+            assertThat(commentRepository.findById(comment.getId()).isPresent()).isFalse();
+        }
+
+        @Test
+        void 삭제_실패_잘못된_게시글_ID() throws Exception {
+            // given
+            Long wrongPostId = 9999L;
+            assertThat(postRepository.findById(wrongPostId).isPresent()).isFalse();
+
+            Comment comment = fixtures.댓글_생성(post, user);
+            assertThat(commentRepository.findById(comment.getId()).isPresent()).isTrue();
+
+            // when
+            mockMvc.perform(
+                    delete(url, wrongPostId, comment.getId())
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            )
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
+
+            // then
+            assertThat(commentRepository.findById(comment.getId()).isPresent()).isTrue();
+        }
+
+        @Test
+        void 삭제_실패_잘못된_댓글_ID() throws Exception {
+            // given
+            Long wrongCommentId = 9999L;
+            assertThat(commentRepository.findById(wrongCommentId).isPresent()).isFalse();
+
+            Comment comment = fixtures.댓글_생성(post, user);
+
+            // when
+            mockMvc.perform(
+                            delete(url, post.getId(), wrongCommentId)
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(COMMENT_NOT_FOUND.getMessage()));
+
+            // then
+            assertThat(commentRepository.findById(comment.getId()).isPresent()).isTrue();
+        }
+
+        @Test
+        void 삭제_실패_내가_작성한_댓글이_아님() throws Exception {
+            // given
+            Comment comment = fixtures.댓글_생성(post, another);
+
+            // when
+            mockMvc.perform(
+                            delete(url, post.getId(), comment.getId())
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").value(COMMENT_WRITER_MISMATCH.getMessage()));
+
+            // then
+            assertThat(commentRepository.findById(comment.getId()).isPresent()).isTrue();
+        }
+    }
+
+    @Nested
+    class 커서_기반_댓글_조회_테스트 {
+
     }
 }
