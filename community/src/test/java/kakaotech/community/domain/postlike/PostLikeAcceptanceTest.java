@@ -8,7 +8,6 @@ import kakaotech.community.domain.postlike.service.PostLikeService;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.global.common.Fixtures;
 import kakaotech.community.global.exception.PostException;
-import kakaotech.community.global.exception.code.ExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,6 +23,7 @@ import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_F
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -135,6 +135,66 @@ public class PostLikeAcceptanceTest {
 
     @Nested
     class 좋아요_취소_테스트 {
+        private final String url = "/posts/{postId}/like";
 
+        @Test
+        void 좋아요_취소_성공() throws Exception {
+            // given
+            postLikeService.like(post.getId(), user.getId());
+            assertThat(postLikeQueryService.isLiked(post, user)).isTrue();
+
+            Long preLikeCount = postService.findById(post.getId()).getLikeCount();
+
+            // when
+            mockMvc.perform(
+                    delete(url, post.getId())
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            )
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.result").value("success"));
+
+            // then
+            assertAll(
+                    () -> assertThat(postLikeQueryService.isLiked(post, user)).isFalse(),
+                    () -> assertThat(postService.findById(post.getId()).getLikeCount()).isLessThan(preLikeCount)
+            );
+        }
+
+        @Test
+        void 좋아요_실패_잘못된_게시글_ID() throws Exception {
+            // given
+            Long wrongPostId = 9999L;
+            assertThatThrownBy(() -> postService.findById(wrongPostId))
+                    .isInstanceOf(PostException.class);
+
+            // when then
+            mockMvc.perform(
+                    delete(url, wrongPostId)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            )
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.message").value(POST_NOT_FOUND.getMessage()));
+        }
+
+        @Test
+        void 좋아요를_누르지않은_게시글에_좋아요_취소_요청() throws Exception {
+            // given
+            assertThat(postLikeQueryService.isLiked(post, user)).isFalse();
+            Long preLikeCount = postService.findById(post.getId()).getLikeCount();
+
+            // when
+            mockMvc.perform(
+                            delete(url, post.getId())
+                                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.result").value("success"));
+
+            // then
+            assertAll(
+                    () -> assertThat(postLikeQueryService.isLiked(post, user)).isFalse(),
+                    () -> assertThat(postService.findById(post.getId()).getLikeCount()).isEqualTo(preLikeCount)
+            );
+        }
     }
 }
