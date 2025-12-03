@@ -2,11 +2,13 @@ package kakaotech.community.domain.post;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import kakaotech.community.domain.image.dto.ImageMeta;
 import kakaotech.community.domain.image.service.ImageService;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.global.common.Fixtures;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static kakaotech.community.global.exception.code.ExceptionCode.INVALID_ARGUMENT;
@@ -50,6 +53,9 @@ public class PostAcceptanceTest {
 
     @Autowired
     private Fixtures fixtures;
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     private ImageService imageService;
@@ -505,9 +511,219 @@ public class PostAcceptanceTest {
         }
     }
 
+    // FIXME. 시간 순으로 조회되는지에 대한 검증이 불가능 -> saveAll로 생성 -> 동시에 만들어짐 -> 시간이 다 똑같음
     @Nested
     class 게시글_페이징_조회_테스트 {
+        private final String url = "/posts";
 
+        @Test
+        void 조회_성공_등록된_게시글_없음() throws Exception {
+            // given
+            assertThat(fetchPostsCount()).isEqualTo(0);
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            get(url)
+                                    .queryParam("page", "1")
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertAll(
+                    () -> assertThat(root.get("elements").isArray()).isTrue(),
+                    () -> assertThat(root.get("elements").isEmpty()).isTrue(),
+                    () -> assertThat(root.get("pageSize").asInt()).isEqualTo(0),
+                    () -> assertThat(root.get("totalPage").asInt()).isEqualTo(0)
+            );
+        }
+
+        @Test
+        @DisplayName("20개보다 적은 게시글일 때 첫페이지로 조회 시 20개 이하의 게시글만 조회")
+        void 조회_성공_개수가_20개_이하일때_첫페이지_조회() throws Exception {
+            // given
+            int size = 15;
+            User someone = fixtures.다른_사용자_생성();
+            fixtures.게시글_여러개_생성(someone, size);
+            assertThat(fetchPostsCount()).isEqualTo(size);
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            get(url)
+                                    .queryParam("page", "1")
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertAll(
+                    () -> assertThat(root.get("elements").size()).isEqualTo(size),
+                    () -> assertThat(root.get("pageNum").asInt()).isEqualTo(1),
+                    () -> assertThat(root.get("pageSize").asInt()).isEqualTo(size),
+                    () -> assertThat(root.get("totalPage").asInt()).isEqualTo(1),
+                    () -> assertThat(root.get("totalSize").asInt()).isEqualTo(size),
+                    () -> { // FIXME. 시간에 대한 검증은 불완전함 -> 동시에 만들다보니 같은 시간으로 찍혀서 제대로 된 검증이 안됨. 보완 필요
+                        JsonNode e = root.get("elements");
+                        assertThat(LocalDateTime.parse(e.get(0).get("createdAt").asText()))
+                                .isAfterOrEqualTo(LocalDateTime.parse(e.get(size - 1).get("createdAt").asText()));
+                    }
+            );
+        }
+
+        @Test
+        @DisplayName("20개 이상의 게시물에서 첫 페이지 조회 시에 최근 등록된 20개의 게시글만 조회")
+        void 조회_성공_개수_20개이상_첫페이지_조회시_최근_20개조회() throws Exception {
+            // given
+            int size = 30;
+            User someone = fixtures.다른_사용자_생성();
+            fixtures.게시글_여러개_생성(someone, size);
+            assertThat(fetchPostsCount()).isEqualTo(size);
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            get(url)
+                                    .queryParam("page", "1")
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertAll(
+                    () -> assertThat(root.get("elements").size()).isEqualTo(20),
+                    () -> assertThat(root.get("pageNum").asInt()).isEqualTo(1),
+                    () -> assertThat(root.get("pageSize").asInt()).isEqualTo(20),
+                    () -> assertThat(root.get("totalPage").asInt()).isEqualTo(2),
+                    () -> assertThat(root.get("totalSize").asInt()).isEqualTo(30)
+            );
+        }
+
+        @Test
+        @DisplayName("충분한 개수의 게시글 중 중간 페이지 조회 시 페이지에 해당되는 20개가 최근 순으로 조회")
+        void 조회_성공_중간_페이지_조회() throws Exception {
+            // given
+            int size = 80;
+            User someone = fixtures.다른_사용자_생성();
+            fixtures.게시글_여러개_생성(someone, size);
+
+            int page = 3;
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            get(url)
+                                    .queryParam("page", String.valueOf(page))
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertAll(
+                    () -> assertThat(root.get("elements").size()).isEqualTo(20),
+                    () -> assertThat(root.get("pageSize").asInt()).isEqualTo(20),
+                    () -> assertThat(root.get("pageNum").asInt()).isNotEqualTo(root.get("totalPage").asInt()),
+                    () -> assertThat(root.get("pageNum").asInt()).isEqualTo(page)
+            );
+        }
+
+        @Test
+        @DisplayName("20개보다 많은 게시글일 때 마지막 페이지 조회 시 페이지 사이즈인 20개가 다 차지 않은 경우의 조회")
+        void 조회_성공_마지막_페이지의_20개가_안되는_개수() throws Exception {
+            // given
+            int size = 50;
+            User someone = fixtures.다른_사용자_생성();
+            fixtures.게시글_여러개_생성(someone, size);
+
+            int lastPage = 3;
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            get(url)
+                                    .queryParam("page", String.valueOf(lastPage))
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertAll(
+                    () -> assertThat(root.get("elements").size()).isEqualTo(10),
+                    () -> assertThat(root.get("pageNum").asInt()).isEqualTo(lastPage),
+                    () -> assertThat(root.get("pageNum").asInt()).isEqualTo(root.get("totalPage").asInt()),
+                    () -> assertThat(root.get("pageSize").asInt()).isLessThan(20)
+            );
+        }
+
+        @Test
+        @DisplayName("20개보다 많은 게시글 일 때 마지막 페이지 조회 시 페이지 사이즈인 20개가 딱 맞아떨어지는 경우의 조회")
+        void 조회_성공_마지막_페이지의_20개가_딱_되는_경우() throws Exception {
+            int size = 60;
+            User someone = fixtures.다른_사용자_생성();
+            fixtures.게시글_여러개_생성(someone, size);
+
+            int lastPage = 3;
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            get(url)
+                                    .queryParam("page", String.valueOf(lastPage))
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertAll(
+                    () -> assertThat(root.get("elements").size()).isEqualTo(20),
+                    () -> assertThat(root.get("pageNum").asInt()).isEqualTo(lastPage),
+                    () -> assertThat(root.get("pageNum").asInt()).isEqualTo(root.get("totalPage").asInt()),
+                    () -> assertThat(root.get("pageSize").asInt()).isEqualTo(20)
+            );
+        }
+
+        @Test
+        @DisplayName("등록된 게시글의 최대 페이지 값보다 더 큰 숫자로 페이지를 입력했을 경우의 조회")
+        void 최대_페이지보다_큰_페이지_값으로_조회() throws Exception {
+            int size = 10;
+            User someone = fixtures.다른_사용자_생성();
+            fixtures.게시글_여러개_생성(someone, size);
+
+            // when
+            MvcResult result = mockMvc.perform(
+                            get(url)
+                                    .queryParam("page", "3")
+                    )
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            // then
+            String content = result.getResponse().getContentAsString();
+            JsonNode root = objectMapper.readTree(content);
+
+            assertAll(
+                    () -> assertThat(root.get("elements").isEmpty()).isTrue(),
+                    () -> assertThat(root.get("pageSize").asInt()).isEqualTo(0)
+            );
+        }
+
+        private Long fetchPostsCount() {
+            return em.createQuery("SELECT count(p) FROM Post p", Long.class)
+                    .getSingleResult();
+        }
     }
 
 

@@ -2,7 +2,7 @@ package kakaotech.community.global.common;
 
 import kakaotech.community.domain.image.ImageStorage;
 import kakaotech.community.domain.post.Post;
-import kakaotech.community.domain.post.PostRepository;
+import kakaotech.community.domain.post.PostJpaRepository;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.domain.user.UserRepository;
 import kakaotech.community.domain.user.port.TokenGenerator;
@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -25,7 +26,7 @@ public final class Fixtures {
     private ImageStorage imageStorage;
 
     @Autowired
-    private PostRepository postRepository;
+    private PostJpaRepository postRepository;
 
     // 사용자
     public String 토큰_발행(User user) {
@@ -67,6 +68,10 @@ public final class Fixtures {
 
     public Post 게시글_생성_이미지_없는(User user) {
         return postRepository.save(PostFixture.oneWithoutImage(user));
+    }
+
+    public List<Post> 게시글_여러개_생성(User user, int size) {
+        return postRepository.saveAll(PostFixture.many(user, size));
     }
 
 }
