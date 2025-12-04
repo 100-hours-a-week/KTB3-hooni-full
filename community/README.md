@@ -62,7 +62,11 @@ root
 | 이미지(Image)        | 이미지 조회 | GET | /images/{id} |
 
 # ERD
-<img width="400" height="580" src="https://github.com/user-attachments/assets/ec275e67-dae4-4eb2-aa46-b9b325d8dba8">
+<img width="400" height="580" src="https://github.com/user-attachments/assets/ece90424-df50-4ee2-b490-a92fca4ca58a">
+
+
+# 영상
+https://github.com/user-attachments/assets/1e77bf24-0b60-4d6d-8765-a93f97c0968f
 
 
 
