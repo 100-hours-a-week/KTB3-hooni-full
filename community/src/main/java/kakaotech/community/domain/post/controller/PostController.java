@@ -6,6 +6,7 @@ import kakaotech.community.domain.post.dto.PostResponse;
 import kakaotech.community.domain.post.service.PostService;
 import kakaotech.community.global.apidoc.PostApiDocs;
 import kakaotech.community.global.auth.annotation.Authenticated;
+import kakaotech.community.global.page.PageResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +33,13 @@ public class PostController implements PostApiDocs {
     }
 
     @GetMapping
-    public ResponseEntity<PostResponse.Summaries> getPosts(int page) {
+    public ResponseEntity<PageResult<PostResponse.Summary>> getPostsByPaging(int page) {
         return ResponseEntity.ok(postService.getPostsByPaging(page));
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse.Detail> getPost(@PathVariable Long postId) {
-        return ResponseEntity.ok(postService.getPost(postId));
+        return ResponseEntity.ok(postService.getPostDetail(postId));
     }
 
     @PutMapping("/{postId}")

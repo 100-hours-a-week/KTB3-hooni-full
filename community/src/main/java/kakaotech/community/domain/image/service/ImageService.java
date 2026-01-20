@@ -43,6 +43,10 @@ public class ImageService {
     }
 
     public UUID updateImage(UUID uuid, MultipartFile file) {
+        if (uuid == null) {
+            return imageStorage.upload(generateUUID(), file);
+        }
+
         ImageMeta preImage = imageStorage.getImage(uuid);
 
         if (preImage.size() != file.getSize()) {

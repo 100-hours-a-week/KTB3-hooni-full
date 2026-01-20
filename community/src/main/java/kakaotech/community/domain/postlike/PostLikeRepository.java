@@ -1,9 +1,12 @@
 package kakaotech.community.domain.postlike;
 
+import kakaotech.community.domain.post.Post;
+import kakaotech.community.domain.user.User;
+
 public interface PostLikeRepository {
     PostLike save(PostLike postLike);
 
-    void delete(Long postId, Long userId);
+    void delete(Post post, User user);
 
-    boolean existsByPostIdAndUserId(Long postId, Long userId);
+    boolean existsByPostAndUser(Post post, User user);
 }

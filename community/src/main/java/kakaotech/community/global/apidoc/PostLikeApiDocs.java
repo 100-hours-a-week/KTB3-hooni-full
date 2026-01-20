@@ -6,13 +6,15 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "게시글 좋아요 API")
 public interface PostLikeApiDocs {
 
-    @Operation(summary = "게시글 좋아요")
+    @Operation(summary = "게시글 좋아요",
+            security = {@SecurityRequirement(name = "Bearer Auth")})
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -37,7 +39,8 @@ public interface PostLikeApiDocs {
     })
     ResponseEntity<?> likePost(@Parameter(hidden = true) Long userId, @Parameter(required = true) Long postId);
 
-    @Operation(summary = "게시글 좋아요 취소")
+    @Operation(summary = "게시글 좋아요 취소",
+            security = {@SecurityRequirement(name = "Bearer Auth")})
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",

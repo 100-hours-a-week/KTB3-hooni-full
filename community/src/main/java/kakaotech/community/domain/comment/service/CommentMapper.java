@@ -10,7 +10,7 @@ public class CommentMapper {
         return new CommentResponse.Detail(
                 comment.getId(),
                 user.getId(),
-                user.getProfileImageId(),
+                user.getProfileImage(),
                 user.getNickname(),
                 comment.getContent(),
                 comment.getCreatedAt()

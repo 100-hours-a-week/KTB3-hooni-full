@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: community
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  profiles:
+    active: mysql

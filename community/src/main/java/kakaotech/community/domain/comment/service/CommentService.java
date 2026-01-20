@@ -1,21 +1,25 @@
 package kakaotech.community.domain.comment.service;
 
 import kakaotech.community.domain.comment.Comment;
+import kakaotech.community.domain.comment.CommentDetailProjection;
 import kakaotech.community.domain.comment.CommentRepository;
 import kakaotech.community.domain.comment.dto.CommentResponse;
+import kakaotech.community.domain.post.Post;
 import kakaotech.community.domain.post.service.PostService;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.domain.user.service.UserService;
 import kakaotech.community.global.exception.CommentException;
+import kakaotech.community.global.page.CursorResult;
+import kakaotech.community.global.page.PageQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 import static kakaotech.community.global.exception.code.ExceptionCode.COMMENT_NOT_FOUND;
 import static kakaotech.community.global.exception.code.ExceptionCode.COMMENT_WRITER_MISMATCH;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CommentService {
     private final PostService postService;
@@ -24,9 +28,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     public CommentResponse.Key create(Long userId, Long postId, String content) {
-        postService.validatePost(postId);
+        Post post = postService.findById(postId);
+        User user = userService.findById(userId);
 
-        Comment comment = commentRepository.save(new Comment(userId, postId, content));
+        Comment comment = commentRepository.save(new Comment(user, post, content));
         return new CommentResponse.Key(comment.getId());
     }
 
@@ -57,22 +62,26 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
+    @Transactional(readOnly = true)
     public CommentResponse.Details getCommentsByCursor(Long postId, int cursor) {
         postService.validatePost(postId);
 
-        List<Comment> comments = commentRepository.findByPostIdAndCursor(postId, cursor);
-        boolean hasNext = commentRepository.hasNextComment(postId, comments.getLast());
+        PageQuery pageQuery = PageQuery.cursor();
+
+        CursorResult<CommentDetailProjection> result = commentRepository.findByPostIdAndCursor(postId, cursor, pageQuery);
+        Long nextCursor = result.elements().isEmpty() ? 0L : result.elements().getLast().commentId();
 
         return new CommentResponse.Details(
                 postId,
-                comments.stream()
-                        .map(comment -> {
-                                    User user = userService.findById(comment.getWriterId());
-
-                                    return CommentMapper.toDetail(comment, user);
-                                }
+                result.elements().stream()
+                        .map(element ->
+                             new CommentResponse.Detail(
+                                    element.commentId(), element.writerId(),
+                                    element.writerProfileImage(), element.writerName(),
+                                    element.content(), element.createdAt()
+                            )
                         ).toList(),
-                new CommentResponse.Paging(comments.getLast().getId(), hasNext)
+                new CommentResponse.Paging(nextCursor, result.hasNext())
         );
     }
 }

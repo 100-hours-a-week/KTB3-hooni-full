@@ -1,54 +1,39 @@
 package kakaotech.community.domain.postlike.service;
 
 import kakaotech.community.domain.post.Post;
-import kakaotech.community.domain.post.PostRepository;
+import kakaotech.community.domain.post.service.PostService;
 import kakaotech.community.domain.postlike.PostLike;
 import kakaotech.community.domain.postlike.PostLikeRepository;
-import kakaotech.community.global.exception.PostException;
+import kakaotech.community.domain.user.User;
+import kakaotech.community.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import static kakaotech.community.global.exception.code.ExceptionCode.POST_NOT_FOUND;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PostLikeService {
-    private final Lock lock = new ReentrantLock();
+    private final UserService userService;
+    private final PostService postService;
 
-    private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
     public void like(Long postId, Long userId) {
-        lock.lock();
-        try {
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+        Post post = postService.findById(postId);
+        User user = userService.findById(userId);
 
-            post.liked();
-            postRepository.save(post);
+        post.liked();
 
-            postLikeRepository.save(new PostLike(postId, userId));
-        } finally {
-            lock.unlock();
-        }
+        postLikeRepository.save(new PostLike(post, user));
     }
 
     public void unlike(Long postId, Long userId) {
-        lock.lock();
-        try {
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new PostException(POST_NOT_FOUND));
+        Post post = postService.findById(postId);
+        User user = userService.findById(userId);
 
-            post.unliked();
-            postRepository.save(post);
+        post.unliked();
 
-            postLikeRepository.delete(postId, userId);
-        } finally {
-            lock.unlock();
-        }
+        postLikeRepository.delete(post, user);
     }
-
 }

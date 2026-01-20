@@ -31,7 +31,7 @@ public enum ExceptionCode {
     // Image
     EMPTY_IMAGE("이미지가 비어있습니다.", BAD_REQUEST),
     IS_NOT_IMAGE_EXTENSION("이미지 타입이 아닙니다.", BAD_REQUEST),
-    IMAGE_NOT_FOUND("이미지를 찾을 수 없습니다.", BAD_REQUEST),
+    IMAGE_NOT_FOUND("이미지를 찾을 수 없습니다.", NOT_FOUND),
     FAILED_TO_UPLOAD_IMAGE("이미지 업로드 중 서버에서 문제 발생", INTERNAL_SERVER_ERROR),
 
     // Comment

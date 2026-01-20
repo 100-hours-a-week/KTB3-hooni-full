@@ -7,6 +7,7 @@ import kakaotech.community.domain.user.dto.UserResponse;
 import kakaotech.community.global.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
@@ -15,31 +16,34 @@ import static kakaotech.community.global.exception.code.ExceptionCode.DUPLICATED
 import static kakaotech.community.global.exception.code.ExceptionCode.USER_NOT_FOUND;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
     private final ImageService imageService;
 
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 
     public UserResponse.Join join(String email, String password, String nickname, MultipartFile image) {
-        if (isDuplicatedEmail(email) | isDuplicatedNickname(nickname)) {
+        if (isDuplicatedEmail(email) || isDuplicatedNickname(nickname)) {
             throw new UserException(DUPLICATED_EMAIL_OR_NICKNAME);
         }
 
         UUID imageId = imageService.save(image);
 
-        Long userId = userRepository.save(UserMapper.toEntity(email, password, nickname, imageId));
-        return new UserResponse.Join(userId);
+        User user = userRepository.save(UserMapper.toEntity(email, password, nickname, imageId));
+        return new UserResponse.Join(user.getId());
     }
 
     private boolean isDuplicatedEmail(String email) {
@@ -70,7 +74,7 @@ public class UserService {
     }
 
     private void changeProfileImage(User user, MultipartFile image) {
-        UUID uuid = imageService.updateImage(user.getProfileImageId(), image);
+        UUID uuid = imageService.updateImage(user.getProfileImage(), image);
         user.updateProfileImage(uuid);
         userRepository.save(user);
     }
@@ -86,5 +90,16 @@ public class UserService {
         User user = findById(userId);
 
         userRepository.delete(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse.Profile getMyProfile(Long userId) {
+        User user = findById(userId);
+        return new UserResponse.Profile(
+                user.getId(),
+                user.getEmail(),
+                user.getNickname(),
+                user.getProfileImage()
+        );
     }
 }

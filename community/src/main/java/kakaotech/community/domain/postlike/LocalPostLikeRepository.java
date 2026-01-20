@@ -1,5 +1,7 @@
 package kakaotech.community.domain.postlike;
 
+import kakaotech.community.domain.post.Post;
+import kakaotech.community.domain.user.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
@@ -23,17 +25,17 @@ public class LocalPostLikeRepository implements PostLikeRepository {
     }
 
     @Override
-    public synchronized void delete(Long postId, Long userId) {
-        if (!postLikeDatabase.containsKey(postId)) {
+    public synchronized void delete(Post post, User user) {
+        if (!postLikeDatabase.containsKey(post.getId())) {
             return;
         }
 
-        postLikeDatabase.get(postId).remove(userId);
+        postLikeDatabase.get(post.getId()).remove(user.getId());
     }
 
     @Override
-    public boolean existsByPostIdAndUserId(Long postId, Long userId) {
-        return postLikeDatabase.containsKey(postId) && postLikeDatabase.get(postId).contains(userId);
+    public boolean existsByPostAndUser(Post post, User user) {
+        return postLikeDatabase.containsKey(post.getId()) && postLikeDatabase.get(post.getId()).contains(user.getId());
     }
 
     public void clear() {
