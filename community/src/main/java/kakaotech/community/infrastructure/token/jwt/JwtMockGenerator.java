@@ -1,4 +1,4 @@
-package kakaotech.community.infrastructure.jwt;
+package kakaotech.community.infrastructure.token.jwt;
 
 import kakaotech.community.domain.user.port.Token;
 import kakaotech.community.domain.user.port.TokenGenerator;
@@ -9,6 +9,11 @@ public class JwtMockGenerator implements TokenGenerator {
 
     @Override
     public Token login(Long userId) {
-        return new Token(String.valueOf(userId));
+        return new Token(String.valueOf(userId), String.valueOf(userId));
+    }
+
+    @Override
+    public Token reissue(String refreshToken) {
+        return null;
     }
 }

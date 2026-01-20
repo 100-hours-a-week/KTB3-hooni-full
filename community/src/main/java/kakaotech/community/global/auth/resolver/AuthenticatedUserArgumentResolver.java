@@ -3,19 +3,20 @@ package kakaotech.community.global.auth.resolver;
 import kakaotech.community.global.auth.annotation.Authenticated;
 import kakaotech.community.global.exception.AuthException;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import static kakaotech.community.global.exception.code.ExceptionCode.AUTH_TOKEN_NOT_FOUND;
-import static kakaotech.community.global.exception.code.ExceptionCode.INVALID_AUTH_TOKEN;
+import static kakaotech.community.global.exception.code.ExceptionCode.AUTH_REQUIRED_REQUEST;
 
 @Component
 public class AuthenticatedUserArgumentResolver implements HandlerMethodArgumentResolver {
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -24,21 +25,21 @@ public class AuthenticatedUserArgumentResolver implements HandlerMethodArgumentR
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        String authHeader = webRequest.getHeader(AUTHORIZATION_HEADER);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
-            throw new AuthException(AUTH_TOKEN_NOT_FOUND);
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                authentication instanceof AnonymousAuthenticationToken) {
+            throw new AuthException(AUTH_REQUIRED_REQUEST);
         }
 
-        String token = authHeader.substring(BEARER_PREFIX.length());
-        return parseToken(token);
+        return parseId(authentication);
     }
 
-    private Long parseToken(String token) {
-        try {
-            return Long.parseLong(token);
-        } catch (NumberFormatException e) {
-            throw new AuthException(INVALID_AUTH_TOKEN);
-        }
+    private Long parseId(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+
+        String id = ((UserDetails) principal).getUsername();
+        return Long.parseLong(id);
     }
 }

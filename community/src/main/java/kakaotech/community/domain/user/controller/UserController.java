@@ -1,11 +1,8 @@
 package kakaotech.community.domain.user.controller;
 
 import jakarta.validation.Valid;
-import kakaotech.community.domain.common.validator.Password;
 import kakaotech.community.domain.user.dto.UserRequest;
 import kakaotech.community.domain.user.dto.UserResponse;
-import kakaotech.community.domain.user.port.Token;
-import kakaotech.community.domain.user.service.AuthService;
 import kakaotech.community.domain.user.service.UserService;
 import kakaotech.community.global.apidoc.UserApiDocs;
 import kakaotech.community.global.auth.annotation.Authenticated;
@@ -21,20 +18,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static kakaotech.community.global.exception.code.ExceptionCode.INVALID_ARGUMENT;
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController implements UserApiDocs {
-    private final AuthService authService;
     private final UserService userService;
-
-    @PostMapping("/login")
-    public ResponseEntity<Token> login(@Valid @RequestBody UserRequest.Login request) {
-        return ResponseEntity.ok(authService.login(request.email(), request.password()));
-    }
 
     @PostMapping
     public ResponseEntity<UserResponse.Join> join(@Valid @ModelAttribute UserRequest.Join request) {
+        if (request.image() == null || request.image().isEmpty()) {
+            throw new IllegalArgumentException(INVALID_ARGUMENT.getMessage());
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.join(request.email(), request.password(), request.nickname(), request.image()));
     }
 

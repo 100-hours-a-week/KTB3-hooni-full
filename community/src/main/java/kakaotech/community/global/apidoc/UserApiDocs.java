@@ -12,48 +12,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kakaotech.community.domain.user.dto.UserRequest;
 import kakaotech.community.domain.user.dto.UserResponse;
-import kakaotech.community.domain.user.port.Token;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "사용자 API")
 public interface UserApiDocs {
-
-    @Operation(summary = "로그인", description = "이메일과 비밀번호를 입력하여 인증을 요청",
-            requestBody = @RequestBody(
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json", schema = @Schema(implementation = UserRequest.Login.class),
-                            examples = @ExampleObject(
-                                    value = """
-                                            {
-                                                "email" : "test@email.com",
-                                                "password" : "@ABCabc123"
-                                            }
-                                            """
-                            ))))
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "로그인 성공",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Token.class),
-                            examples = @ExampleObject(
-                                    value = """
-                                            {
-                                                "accessToken" : "1"
-                                            }
-                                            """
-                            ))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "이메일 인증 실패"
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "비밀번호 인증 실패"
-            )
-    })
-    ResponseEntity<Token> login(UserRequest.Login request);
 
     @Operation(summary = "회원가입", description = "이메일, 비밀번호, 닉네임, 프로필 이미지를 입력하여 회원가입을 요청",
             requestBody = @RequestBody(

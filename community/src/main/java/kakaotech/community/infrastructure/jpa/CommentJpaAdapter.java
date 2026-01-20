@@ -41,7 +41,7 @@ public class CommentJpaAdapter implements CommentRepository {
     @Override
     public CursorResult<CommentDetailProjection> findByPostIdAndCursor(Long postId, int cursor, PageQuery pageQuery) {
         Sort.Direction direction = (pageQuery.sort().direction() == SortSpec.Direction.ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Pageable pageable = PageRequest.of(pageQuery.pageNum(), pageQuery.pageSize(), Sort.by(direction, pageQuery.sort().property()));
+        Pageable pageable = PageRequest.of(pageQuery.pageNum(), pageQuery.pageSize(), Sort.by(direction, pageQuery.sort().property(), "id"));
 
         Slice<CommentDetailProjection> results = commentJpaRepository.findCommentDetailsByPostId(postId, cursor, pageable);
 

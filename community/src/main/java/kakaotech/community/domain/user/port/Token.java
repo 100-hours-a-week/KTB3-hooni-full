@@ -1,15 +1,14 @@
 package kakaotech.community.domain.user.port;
 
-import kakaotech.community.domain.user.User;
+import lombok.Getter;
 
+@Getter
 public final class Token {
     private final String accessToken;
+    private final String refreshToken;
 
-    public Token(String accessToken) {
+    public Token(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
-    }
-
-    public String getAccessToken() {
-        return this.accessToken;
+        this.refreshToken = refreshToken;
     }
 }

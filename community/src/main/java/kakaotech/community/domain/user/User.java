@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import kakaotech.community.domain.user.port.encode.Encoder;
 import kakaotech.community.global.entity.BaseEntity;
 import kakaotech.community.global.exception.AuthException;
 import lombok.AccessLevel;
@@ -30,7 +31,7 @@ public class User extends BaseEntity {
     private String email;
 
     @Column(name = "password")
-    private String password; // TODO. Encoding 필요
+    private String password;
 
     @Column(name = "nickname")
     private String nickname;
@@ -58,8 +59,8 @@ public class User extends BaseEntity {
         return this.nickname.equals(nickname);
     }
 
-    public void validateLoginable(String password) {
-        if (!this.password.equals(password)) {
+    public void validateLoginable(Encoder encoder, String password) {
+        if (!encoder.matches(password, this.password)) {
             throw new AuthException(FAILED_TO_LOGIN);
         }
     }

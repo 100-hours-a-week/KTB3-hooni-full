@@ -4,6 +4,7 @@ import kakaotech.community.domain.image.service.ImageService;
 import kakaotech.community.domain.user.User;
 import kakaotech.community.domain.user.UserRepository;
 import kakaotech.community.domain.user.dto.UserResponse;
+import kakaotech.community.domain.user.port.encode.Encoder;
 import kakaotech.community.global.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import static kakaotech.community.global.exception.code.ExceptionCode.USER_NOT_F
 @Transactional
 @RequiredArgsConstructor
 public class UserService {
+    private final Encoder encoder;
+
     private final ImageService imageService;
 
     private final UserRepository userRepository;
@@ -42,7 +45,8 @@ public class UserService {
 
         UUID imageId = imageService.save(image);
 
-        User user = userRepository.save(UserMapper.toEntity(email, password, nickname, imageId));
+        String encodedPw = encoder.encode(password);
+        User user = userRepository.save(UserMapper.toEntity(email, encodedPw, nickname, imageId));
         return new UserResponse.Join(user.getId());
     }
 
@@ -58,32 +62,22 @@ public class UserService {
         User user = findById(userId);
 
         if (nickname != null) {
-            changeNickname(user, nickname);
+            user.updateNickname(nickname);
         }
 
         if (image != null) {
-            changeProfileImage(user, image);
+            UUID uuid = imageService.updateImage(user.getProfileImage(), image);
+            user.updateProfileImage(uuid);
         }
 
         return UserMapper.toUpdated(user);
     }
 
-    private void changeNickname(User user, String nickname) {
-        user.updateNickname(nickname);
-        userRepository.save(user);
-    }
-
-    private void changeProfileImage(User user, MultipartFile image) {
-        UUID uuid = imageService.updateImage(user.getProfileImage(), image);
-        user.updateProfileImage(uuid);
-        userRepository.save(user);
-    }
-
     public void changePassword(Long userId, String password) {
         User user = findById(userId);
 
-        user.updatePassword(password);
-        userRepository.save(user);
+        String encodedPw = encoder.encode(password);
+        user.updatePassword(encodedPw);
     }
 
     public void delete(Long userId) {
