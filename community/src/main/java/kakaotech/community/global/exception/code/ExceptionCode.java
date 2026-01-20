@@ -23,6 +23,8 @@ public enum ExceptionCode {
     FAILED_TO_LOGIN("잘못된 이메일 혹은 비밀번호입니다.", UNAUTHORIZED),
     AUTH_TOKEN_NOT_FOUND("인증 토큰을 찾을 수 없습니다", UNAUTHORIZED),
     INVALID_AUTH_TOKEN("유효하지 않은 토큰입니다.", UNAUTHORIZED),
+    AUTH_REQUIRED_REQUEST("인증이 필요한 요청입니다", UNAUTHORIZED),
+    RE_LOGIN_REQUIRED("로그인 세션이 만료되었습니다. 재로그인해주세요", UNAUTHORIZED),
 
     // Post
     POST_NOT_FOUND("게시글을 찾을 수 없습니다", NOT_FOUND),
@@ -39,6 +41,8 @@ public enum ExceptionCode {
     COMMENT_WRITER_MISMATCH("작성 권한이 없습니다", FORBIDDEN),
     INVALID_COMMENT_CURSOR("커서 값이 올바르지 않습니다", BAD_REQUEST),
 
+    // Common
+    INVALID_ARGUMENT("잘못된 인자로 요청했습니다", BAD_REQUEST);
     ;
 
     private final String message;

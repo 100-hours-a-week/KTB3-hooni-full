@@ -16,12 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostLikeService {
     private final UserService userService;
     private final PostService postService;
+    private final PostLikeQueryService postLikeQueryService;
 
     private final PostLikeRepository postLikeRepository;
 
     public void like(Long postId, Long userId) {
         Post post = postService.findById(postId);
         User user = userService.findById(userId);
+
+        if (postLikeQueryService.isLiked(post, user)) {
+            return;
+        }
 
         post.liked();
 
@@ -31,6 +36,10 @@ public class PostLikeService {
     public void unlike(Long postId, Long userId) {
         Post post = postService.findById(postId);
         User user = userService.findById(userId);
+
+        if (!postLikeQueryService.isLiked(post, user)) {
+            return;
+        }
 
         post.unliked();
 

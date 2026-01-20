@@ -11,4 +11,4 @@ spring:
         show_sql: true
 
   profiles:
-    active: mysql
+    active: mysql, jwt
